@@ -1,0 +1,20 @@
+#!@PYTHON@
+
+import os
+import sys
+import signal
+import gettext
+
+VERSION = '@VERSION@'
+pkgdatadir = '@pkgdatadir@'
+localedir = '@localedir@'
+
+sys.path.insert(1, pkgdatadir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+if __name__ == '__main__':
+    import gi
+    from gi.repository import Gio
+
+    from pmos_tweaks import __main__
+    sys.exit(__main__.main(VERSION))

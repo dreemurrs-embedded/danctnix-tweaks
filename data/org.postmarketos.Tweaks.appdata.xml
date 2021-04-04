@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2021 Martijn Braam -->
+<component type="desktop-application">
+    <id>org.postmarketos.Tweaks</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0</project_license>
+    <name>postmarketOS Tweaks</name>
+    <summary>Mobile settings tweak application</summary>
+    <description>
+        <p>
+            A Gnome-Tweaks like application for modifying phone settings
+        </p>
+    </description>
+    <launchable type="desktop-id">org.postmarketos.Tweaks.desktop</launchable>
+    <provides>
+        <binary>pmos-tweaks</binary>
+    </provides>
+    <screenshots>
+        <screenshot type="default">
+            <image>http://brixitcdn.net/metainfo/numberstation.png</image>
+        </screenshot>
+    </screenshots>
+    <url type="homepage">https://sr.ht/~martijnbraam/numberstation</url>
+    <url type="bugtracker">https://todo.sr.ht/~martijnbraam/numberstation</url>
+    <content_rating type="oars-1.1"/>
+    <releases>
+        <release version="0.1.0" date="2021-03-23">
+            <description>
+                <p>
+                    First release
+                </p>
+            </description>
+        </release>
+    </releases>
+</component>

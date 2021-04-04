@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Tweaks
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=pmos-tweaks %u
+GenericName=Tweaks
+Icon=org.postmarketos.Tweaks
+Categories=GTK;GNOME;Utility
+X-DBUS-ServiceName=org.postmarketos.Tweaks

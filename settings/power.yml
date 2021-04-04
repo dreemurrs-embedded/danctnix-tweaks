@@ -1,0 +1,49 @@
+- name: Power
+  weight: 20
+  sections:
+    - name: Automatic suspend
+      weight: 0
+      settings:
+        - name: On battery power
+          type: boolean
+          backend: gsettings
+          gtype: string
+          key: org.gnome.settings-daemon.plugins.power.sleep-inactive-battery-type
+          map:
+            true: suspend
+            false: nothing
+
+        - name: Battery time
+          type: choice
+          gtype: number
+          backend: gsettings
+          key: org.gnome.settings-daemon.plugins.power.sleep-inactive-battery-timeout
+          map:
+            1 Minute: 60
+            2 Minutes: 120
+            5 Minutes: 300
+            10 Minutes: 600
+            20 Minutes: 1200
+            1 Hour: 3600
+
+        - name: On AC power
+          type: boolean
+          backend: gsettings
+          gtype: string
+          key: org.gnome.settings-daemon.plugins.power.sleep-inactive-ac-type
+          map:
+            true: suspend
+            false: nothing
+
+        - name: AC time
+          type: choice
+          gtype: number
+          backend: gsettings
+          key: org.gnome.settings-daemon.plugins.power.sleep-inactive-ac-timeout
+          map:
+            1 Minute: 60
+            2 Minutes: 120
+            5 Minutes: 300
+            10 Minutes: 600
+            20 Minutes: 1200
+            1 Hour: 3600

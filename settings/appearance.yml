@@ -1,0 +1,15 @@
+- name: Appearance
+  weight: 30
+  sections:
+    - name: GTK
+      weight: 0
+      settings:
+        - name: Prefer dark
+          type: boolean
+          help: Prefer the dark version of the theme if available
+          backend: gtk3settings
+          key: gtk-application-prefer-dark-theme
+          default: "0"
+          map:
+            true: "1"
+            false: "0"

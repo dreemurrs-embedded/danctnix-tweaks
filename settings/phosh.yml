@@ -1,0 +1,26 @@
+- name: Phosh
+  weight: 10
+  sections:
+    - name: Clock
+      weight: 10
+      settings:
+        - name: Weekday
+          type: boolean
+          backend: gsettings
+          key: org.gnome.desktop.interface.clock-show-weekday
+        - name: Date
+          type: boolean
+          backend: gsettings
+          key: org.gnome.desktop.interface.clock-show-date
+        - name: Seconds
+          type: boolean
+          backend: gsettings
+          key: org.gnome.desktop.interface.clock-show-seconds
+    - name: Performance
+      weight: 20
+      settings:
+        - name: Animations
+          help: Disable GTK3 animations to speed up applications
+          type: boolean
+          backend: gsettings
+          key: org.gnome.desktop.interface.enable-animations
