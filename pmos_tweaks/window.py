@@ -10,9 +10,8 @@ from gi.repository import Handy
 
 
 class TweaksWindow:
-    def __init__(self, application, args):
+    def __init__(self, application):
         self.application = application
-        self.args = args
 
         Handy.init()
 
@@ -28,6 +27,7 @@ class TweaksWindow:
         self.create_window()
 
         self.settings = SettingsTree()
+        self.settings.load_dir('/etc/postmarketos-tweaks')
         self.settings.load_dir('../settings')
 
         self.create_pages()
