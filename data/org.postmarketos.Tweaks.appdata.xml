@@ -17,14 +17,12 @@
     </provides>
     <screenshots>
         <screenshot type="default">
-            <image>http://brixitcdn.net/metainfo/numberstation.png</image>
+            <image>https://brixitcdn.net/metainfo/tweaks.png</image>
         </screenshot>
     </screenshots>
-    <url type="homepage">https://sr.ht/~martijnbraam/numberstation</url>
-    <url type="bugtracker">https://todo.sr.ht/~martijnbraam/numberstation</url>
     <content_rating type="oars-1.1"/>
     <releases>
-        <release version="0.1.0" date="2021-03-23">
+        <release version="0.1.0" date="2021-04-05">
             <description>
                 <p>
                     First release
