@@ -1,7 +1,7 @@
 - name: Appearance
   weight: 30
   sections:
-    - name: GTK
+    - name: GTK 3
       weight: 0
       settings:
         - name: Prefer dark
@@ -13,3 +13,17 @@
           map:
             true: "1"
             false: "0"
+        - name: Theme
+          type: choice
+          backend: gsettings
+          help: The theme for GTK3 applications
+          gtype: string
+          key: org.gnome.desktop.interface.gtk-theme
+          data: gtk3themes
+        - name: Icons
+          type: choice
+          backend: gsettings
+          help: The icon theme for GTK3 applications
+          gtype: string
+          key: org.gnome.desktop.interface.icon-theme
+          data: iconthemes

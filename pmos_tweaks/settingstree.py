@@ -5,7 +5,13 @@ import configparser
 
 import yaml
 
-from gi.repository import Gio
+import gi
+
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gio, Gtk
+
+# Needed for qt5 theming, disabled because qt5 theming is a mess
+#from PyQt5 import QtWidgets
 
 
 class Setting:
@@ -23,6 +29,10 @@ class Setting:
         self.widget = None
 
         self.map = definition['map'] if 'map' in definition else None
+        self.data = definition['data'] if 'data' in definition else None
+
+        if self.data:
+            self.create_map_from_data()
 
         if self.backend == 'gsettings':
             key = self.definition['key']
@@ -38,6 +48,8 @@ class Setting:
             self.file = os.path.join(os.getenv('XDG_CONFIG_HOME', '~/.config'), 'gtk-3.0/settings.ini')
             self.file = os.path.expanduser(self.file)
             self.default = definition['default'] if 'default' in definition else None
+        elif self.backend == 'environment':
+            self.key = definition['key']
 
     def connect(self, callback):
         self.callback = callback
@@ -62,6 +74,8 @@ class Setting:
                 value = ini.get('Settings', self.key)
             else:
                 value = self.default
+        elif self.backend == 'environment':
+            value = os.getenv(self.key, default='')
 
         if self.map:
             for key in self.map:
@@ -88,6 +102,70 @@ class Setting:
             os.makedirs(os.path.dirname(self.file), exist_ok=True)
             with open(self.file, 'w') as handle:
                 ini.write(handle)
+        elif self.backend == 'environment':
+            file = os.path.expanduser('~/.pam_environment')
+            lines = []
+            if os.path.isfile(file):
+                with open(file) as handle:
+                    lines = list(handle.readlines())
+
+            for i, line in enumerate(lines):
+                if line.startswith(f'export {self.key}='):
+                    lines[i] = f'export {self.key}={value}\n'
+                    break
+            else:
+                lines.append(f'export {self.key}={value}\n')
+
+            with open(file, 'w') as handle:
+                handle.writelines(lines)
+
+    def create_map_from_data(self):
+        if self.data == 'gtk3themes':
+            result = []
+            gtk_ver = Gtk.MINOR_VERSION
+            if gtk_ver % 2:
+                gtk_ver += 1
+            gtk_ver = f'3.{gtk_ver}'
+
+            for dir in glob.glob('/usr/share/themes/*'):
+                if os.path.isfile(os.path.join(dir, 'gtk-3.0/gtk.css')):
+                    result.append(os.path.basename(dir))
+                elif os.path.isdir(os.path.join(dir, f'gtk-{gtk_ver}')):
+                    result.append(os.path.basename(dir))
+            self.map = {}
+            for theme in sorted(result):
+                name = theme
+                metafile = os.path.join('/usr/share/themes', theme, 'index.theme')
+                if os.path.isfile(metafile):
+                    p = configparser.SafeConfigParser()
+                    p.read(metafile)
+                    if p.has_section('X-GNOME-Metatheme'):
+                        name = p.get('X-GNOME-Metatheme', 'name', fallback=name)
+                    if p.has_section('Desktop Entry'):
+                        name = p.get('Desktop Entry', 'Name', fallback=name)
+
+                self.map[name] = theme
+        elif self.data == 'iconthemes':
+            result = []
+            for dir in glob.glob('/usr/share/icons/*'):
+                if os.path.isfile(os.path.join(dir, 'index.theme')):
+                    result.append(os.path.basename(dir))
+
+            self.map = {}
+            for theme in sorted(result):
+                name = theme
+                metafile = os.path.join('/usr/share/icons', theme, 'index.theme')
+                p = configparser.SafeConfigParser()
+                p.read(metafile)
+                if p.has_section('Icon Theme'):
+                    name = p.get('Icon Theme', 'Name', fallback=name)
+
+                self.map[name] = theme
+        elif self.data == 'qt5platformthemes':
+            result = QtWidgets.QStyleFactory.keys()
+            self.map = {}
+            for theme in result:
+                self.map[theme] = theme
 
     def __getitem__(self, item):
         return getattr(self, item)

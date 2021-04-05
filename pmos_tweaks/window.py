@@ -183,7 +183,6 @@ class TweaksWindow:
         elif setting.type == 'choice':
             i = 0
             for key in setting.map:
-                setting.widget.append_text(key)
                 if key == value:
                     setting.widget.set_active(i)
                 i += 1
