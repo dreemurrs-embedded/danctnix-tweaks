@@ -89,8 +89,8 @@ class TweaksWindow:
         # Generate the items in the sidebar
         for page in self.settings.settings:
             label = Gtk.Label(label=page, xalign=0.0)
-            label.set_margin_top(7)
-            label.set_margin_bottom(7)
+            label.set_margin_top(8)
+            label.set_margin_bottom(8)
             label.set_margin_left(10)
             label.set_margin_right(10)
             label.set_name('row')
@@ -200,6 +200,11 @@ class TweaksWindow:
             self.stack.set_visible_child_name(row.name)
             self.headerbar.set_subtitle(row.title)
             self.leaflet.set_visible_child_name('content')
+
+            # In folded view unselect the row in the listbox
+            # so it's possible to go back to the same page
+            if self.leaflet.get_folded():
+                self.listbox.unselect_row(row)
 
     def on_main_window_destroy(self, widget):
         Gtk.main_quit()
