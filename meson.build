@@ -8,4 +8,6 @@ dependency('libhandy-1', version: '>=1.0.0')
 subdir('data')
 subdir('pmos_tweaks')
 
+install_subdir('settings', install_dir: get_option('datadir') / 'postmarketos-tweaks')
+
 meson.add_install_script('build-aux/meson/postinstall.py')

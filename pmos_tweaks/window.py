@@ -1,3 +1,5 @@
+import os
+
 import gi
 
 from pmos_tweaks.settingstree import SettingsTree
@@ -10,7 +12,7 @@ from gi.repository import Handy
 
 
 class TweaksWindow:
-    def __init__(self, application):
+    def __init__(self, application, datadir):
         self.application = application
 
         Handy.init()
@@ -27,7 +29,10 @@ class TweaksWindow:
         self.create_window()
 
         self.settings = SettingsTree()
+        if datadir:
+            self.settings.load_dir(os.path.join(datadir, 'postmarketos-tweaks'))
         self.settings.load_dir('/etc/postmarketos-tweaks')
+        self.settings.load_dir('settings')
         self.settings.load_dir('../settings')
 
         self.create_pages()

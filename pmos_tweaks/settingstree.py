@@ -101,7 +101,9 @@ class SettingsTree:
         return OrderedDict({k: v for k, v in test})
 
     def load_dir(self, path):
+        print(f"Scanning {path}")
         for file in glob.glob(os.path.join(path, '*.yml')):
+            print(f"  Loading {file}")
             with open(file) as handle:
                 raw = handle.read()
 

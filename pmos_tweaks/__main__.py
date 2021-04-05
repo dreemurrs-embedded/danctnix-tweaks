@@ -12,17 +12,18 @@ from gi.repository import Handy
 
 
 class TweaksApplication(Gtk.Application):
-    def __init__(self, application_id, flags):
+    def __init__(self, application_id, flags, datadir):
+        self.datadir = datadir
         Gtk.Application.__init__(self, application_id=application_id, flags=flags)
         self.connect("activate", self.new_window)
 
     def new_window(self, *args):
-        TweaksWindow(self)
+        TweaksWindow(self, self.datadir)
 
 
-def main(version):
+def main(version, datadir=None):
     Handy.init()
-    app = TweaksApplication("org.postmarketos.Tweaks", Gio.ApplicationFlags.FLAGS_NONE)
+    app = TweaksApplication("org.postmarketos.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
     app.run()
 
 
