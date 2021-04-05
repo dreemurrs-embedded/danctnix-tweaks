@@ -173,6 +173,25 @@ class TweaksWindow:
                         widget.connect('changed', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
+                    elif setting.type == 'font':
+                        widget = Gtk.FontButton()
+                        setting.widget = widget
+                        widget.setting = setting
+                        widget.set_font(setting.get_value())
+                        widget.connect('font-set', self.on_widget_changed)
+                        setting.connect(self.on_setting_change)
+                        wbox.pack_start(widget, False, False, 0)
+                    elif setting.type == 'number':
+                        w_min = setting.definition['min']
+                        w_max = setting.definition['max']
+                        w_step = setting.definition['step']
+                        widget = Gtk.SpinButton.new_with_range(w_min, w_max, w_step)
+                        setting.widget = widget
+                        widget.setting = setting
+                        widget.set_value(setting.get_value())
+                        widget.connect('value-changed', self.on_widget_changed)
+                        setting.connect(self.on_setting_change)
+                        wbox.pack_start(widget, False, False, 0)
 
         widget = self.listbox.get_row_at_index(0)
         self.listbox.select_row(widget)
@@ -186,6 +205,10 @@ class TweaksWindow:
                 if key == value:
                     setting.widget.set_active(i)
                 i += 1
+        elif setting.type == 'font':
+            setting.widget.set_font(value)
+        elif setting.type == 'number':
+            setting.widget.set_value(value)
 
     def on_widget_changed(self, widget, *args):
         setting = widget.setting
@@ -193,6 +216,10 @@ class TweaksWindow:
             setting.set_value(widget.get_active())
         elif setting.type == 'choice':
             setting.set_value(widget.get_active_text())
+        elif setting.type == 'font':
+            setting.set_value(widget.get_font())
+        elif setting.type == 'number':
+            setting.set_value(widget.get_value())
 
     def on_select_page(self, widget, row):
         if row:

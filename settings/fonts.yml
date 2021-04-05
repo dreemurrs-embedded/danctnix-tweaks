@@ -1,0 +1,45 @@
+- name: Fonts
+  weight: 40
+  sections:
+    - name: Interface font
+      weight: 0
+      settings:
+        - name: Interface
+          type: font
+          help: The default interface text font
+          backend: gsettings
+          gtype: string
+          key: org.gnome.desktop.interface.font-name
+        - name: Document
+          type: font
+          help: The default font for reading documents
+          backend: gsettings
+          gtype: string
+          key: org.gnome.desktop.interface.document-font-name
+        - name: Monospace
+          type: font
+          help: Name of a monospaced (fixed-width) font for use in locations like terminals.
+          backend: gsettings
+          gtype: string
+          key: org.gnome.desktop.interface.monospace-font-name
+    - name: Font rendering
+      weight: 10
+      settings:
+        - name: Hinting
+          type: choice
+          help: The type of hinting to use when rendering fonts.
+          gtype: string
+          key: org.gnome.settings-daemon.plugins.xsettings.hinting
+          map:
+            None: none
+            Slight: slight
+            Medium: medium
+            Full: full
+        - name: Scaling
+          type: number
+          gtype: double
+          help: Scaling factor for all font sizes
+          key: org.gnome.desktop.interface.text-scaling-factor
+          min: 0.5
+          max: 3
+          step: 0.1

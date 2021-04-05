@@ -67,6 +67,8 @@ class Setting:
                 value = self._settings.get_string(self.key)
             elif self.gtype == 'number':
                 value = self._settings.get_int(self.key)
+            elif self.gtype == 'double':
+                value = self._settings.get_double(self.key)
         elif self.backend == 'gtk3settings':
             if os.path.isfile(self.file):
                 ini = configparser.SafeConfigParser()
@@ -94,6 +96,8 @@ class Setting:
                 self._settings.set_string(self.key, value)
             elif self.gtype == 'number':
                 self._settings.set_int(self.key, value)
+            elif self.gtype == 'double':
+                self._settings.set_double(self.key, value)
         elif self.backend == 'gtk3settings':
             ini = configparser.SafeConfigParser()
             if os.path.isfile(self.file):
