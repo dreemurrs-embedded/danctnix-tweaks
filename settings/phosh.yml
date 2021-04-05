@@ -20,7 +20,7 @@
       weight: 20
       settings:
         - name: Animations
-          help: Disable GTK3 animations to speed up applications
+          help: Animations in Phosh and GTK can be disabled for performance
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.enable-animations
