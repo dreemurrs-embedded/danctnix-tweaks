@@ -85,6 +85,7 @@ class Setting:
             if os.path.isfile(self.file):
                 ini.read(self.file)
             ini.set('Settings', self.key, value)
+            os.makedirs(os.path.dirname(self.file), exist_ok=True)
             with open(self.file, 'w') as handle:
                 ini.write(handle)
 
