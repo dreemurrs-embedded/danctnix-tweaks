@@ -29,7 +29,9 @@
           type: choice
           help: The type of hinting to use when rendering fonts.
           gtype: string
-          key: org.gnome.settings-daemon.plugins.xsettings.hinting
+          key:
+            - org.gnome.settings-daemon.plugins.xsettings.hinting
+            - org.gnome.desktop.interface.font-hinting
           map:
             None: none
             Slight: slight

@@ -10,8 +10,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, Gtk
 
+
 # Needed for qt5 theming, disabled because qt5 theming is a mess
-#from PyQt5 import QtWidgets
+# from PyQt5 import QtWidgets
 
 
 class Setting:
@@ -27,6 +28,7 @@ class Setting:
         self.definition = definition
         self.callback = None
         self.widget = None
+        self.valid = True
 
         self.map = definition['map'] if 'map' in definition else None
         self.data = definition['data'] if 'data' in definition else None
@@ -35,14 +37,32 @@ class Setting:
             self.create_map_from_data()
 
         if self.backend == 'gsettings':
-            key = self.definition['key']
-            part = key.split('.')
-            self.base_key = '.'.join(part[0:-1])
-            self.key = part[-1]
-            self._settings = Gio.Settings.new(self.base_key)
+            self.gtype = definition['gtype'] if 'gtype' in definition else definition['type']
+
+            if not isinstance(self.definition['key'], list):
+                self.definition['key'] = [self.definition['key']]
+            for key in self.definition['key']:
+                part = key.split('.')
+                self.base_key = '.'.join(part[0:-1])
+                self.key = part[-1]
+
+                source = Gio.SettingsSchemaSource.get_default()
+                if source.lookup(self.base_key, True) is None:
+                    continue
+                self._settings = Gio.Settings.new(self.base_key)
+
+                if self.key not in self._settings.keys():
+                    continue
+                break
+            else:
+                print(f"None of the keys for {self.name} exist")
+                for key in self.definition['key']:
+                    print(f" - {key}")
+                self.valid = False
+                return
+
             self._settings.connect(f'changed::{self.key}', self._callback)
 
-            self.gtype = definition['gtype'] if 'gtype' in definition else definition['type']
         elif self.backend == 'gtk3settings':
             self.key = definition['key']
             self.file = os.path.join(os.getenv('XDG_CONFIG_HOME', '~/.config'), 'gtk-3.0/settings.ini')
@@ -219,8 +239,11 @@ class SettingsTree:
                     for setting in section['settings']:
 
                         if setting['name'] not in self.settings[page['name']]['sections'][section['name']]['settings']:
+                            setting_obj = Setting(setting)
+                            if not setting_obj.valid:
+                                continue
                             self.settings[page['name']]['sections'][section['name']]['settings'][
-                                setting['name']] = Setting(setting)
+                                setting['name']] = setting_obj
 
         self.settings = self._sort_weight(self.settings)
         for page in self.settings:
