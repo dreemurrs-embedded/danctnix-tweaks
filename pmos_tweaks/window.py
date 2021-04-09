@@ -26,6 +26,8 @@ class TweaksWindow:
         self.stack = None
         self.back = None
 
+        self.first_select = True
+
         self.create_window()
 
         self.settings = SettingsTree()
@@ -193,8 +195,7 @@ class TweaksWindow:
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
 
-        widget = self.listbox.get_row_at_index(0)
-        self.listbox.select_row(widget)
+        self.leaflet.set_visible_child_name('sidebar')
 
     def on_setting_change(self, setting, value):
         if setting.type == 'boolean':
@@ -225,7 +226,10 @@ class TweaksWindow:
         if row:
             self.stack.set_visible_child_name(row.name)
             self.headerbar.set_subtitle(row.title)
-            self.leaflet.set_visible_child_name('content')
+            if self.first_select:
+                self.first_select = False
+            else:
+                self.leaflet.set_visible_child_name('content')
 
             # In folded view unselect the row in the listbox
             # so it's possible to go back to the same page
