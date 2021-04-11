@@ -1,0 +1,17 @@
+- name: Power
+  weight: 20
+  sections:
+    - name: PinePhone Battery control
+      weight: 10
+      settings:
+        - name: Maximum charge level
+          type: number
+          min: 3.0
+          max: 4.35
+          step: 0.05
+          percentage: true
+          help: Limit the maximum level of charge for the battery which increases battery durability.
+          backend: sysfs
+          key: /sys/class/power_supply/axp20x-battery/voltage_max_design
+          stype: int
+          multiplier: 1000000

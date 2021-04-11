@@ -1,0 +1,18 @@
+#!@PYTHON@
+
+import os
+import sys
+import signal
+import gettext
+
+VERSION = '@VERSION@'
+pkgdatadir = '@pkgdatadir@'
+datadir = '@datadir@'
+localedir = '@localedir@'
+
+sys.path.insert(1, pkgdatadir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+if __name__ == '__main__':
+    from pmos_tweaks import tweakd
+    sys.exit(tweakd.main(VERSION, datadir=datadir))

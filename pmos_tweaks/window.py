@@ -1,4 +1,7 @@
 import os
+import subprocess
+import tempfile
+import time
 
 import gi
 
@@ -85,6 +88,18 @@ class TweaksWindow:
 
         box.pack_start(self.headerbar, False, True, 0)
         box.pack_start(self.leaflet, True, True, 0)
+
+        self.actionbar = Gtk.ActionBar()
+        self.action_revealer = Gtk.Revealer()
+        box.pack_start(self.action_revealer, False, True, 0)
+        self.action_revealer.add(self.actionbar)
+        label = Gtk.Label(label="You have changed settings that need root permissions to save.", xalign=0.0)
+        label.set_line_wrap(True)
+        self.actionbar.pack_start(label)
+        self.action_button = Gtk.Button.new_with_label("Apply")
+        self.action_button.get_style_context().add_class('suggested-action')
+        self.actionbar.pack_end(self.action_button)
+        self.action_button.connect('clicked', self.on_save_settings)
 
     def create_pages(self):
 
@@ -184,13 +199,22 @@ class TweaksWindow:
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
                     elif setting.type == 'number':
-                        w_min = setting.definition['min']
-                        w_max = setting.definition['max']
-                        w_step = setting.definition['step']
+                        value = setting.get_value()
+                        if 'percentage' in setting.definition and setting.definition['percentage']:
+                            w_min = 0
+                            w_max = 100
+                            w_step = 1
+                            val_range = setting.definition['max'] - setting.definition['min']
+                            value = int((value - setting.definition['min']) / val_range * 100)
+
+                        else:
+                            w_min = setting.definition['min']
+                            w_max = setting.definition['max']
+                            w_step = setting.definition['step']
                         widget = Gtk.SpinButton.new_with_range(w_min, w_max, w_step)
                         setting.widget = widget
                         widget.setting = setting
-                        widget.set_value(setting.get_value())
+                        widget.set_value(value)
                         widget.connect('value-changed', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
@@ -209,10 +233,15 @@ class TweaksWindow:
         elif setting.type == 'font':
             setting.widget.set_font(value)
         elif setting.type == 'number':
+            if 'percentage' in setting.definition and setting.definition['percentage']:
+                val_range = setting.definition['max'] - setting.definition['min']
+                value = int((value - setting.definition['min']) / val_range * 100)
             setting.widget.set_value(value)
 
     def on_widget_changed(self, widget, *args):
         setting = widget.setting
+        if setting.needs_root:
+            self.action_revealer.set_reveal_child(True)
         if setting.type == 'boolean':
             setting.set_value(widget.get_active())
         elif setting.type == 'choice':
@@ -220,7 +249,11 @@ class TweaksWindow:
         elif setting.type == 'font':
             setting.set_value(widget.get_font())
         elif setting.type == 'number':
-            setting.set_value(widget.get_value())
+            value = widget.get_value()
+            if 'percentage' in setting.definition and setting.definition['percentage']:
+                val_range = setting.definition['max'] - setting.definition['min']
+                value = (value / 100 * val_range) + setting.definition['min']
+            setting.set_value(value)
 
     def on_select_page(self, widget, row):
         if row:
@@ -246,3 +279,12 @@ class TweaksWindow:
         folded = self.leaflet.get_folded()
         content = self.leaflet.get_visible_child_name() == "content"
         self.back.set_visible(folded and content)
+
+    def on_save_settings(self, *args):
+        fd, filename = tempfile.mkstemp()
+        with open(filename, 'w') as handle:
+            self.settings.save_tweakd_config(handle)
+
+        subprocess.run(['pkexec', 'pk-tweaks-action', filename])
+
+        self.action_revealer.set_reveal_child(False)

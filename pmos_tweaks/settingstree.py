@@ -29,6 +29,8 @@ class Setting:
         self.callback = None
         self.widget = None
         self.valid = True
+        self.needs_root = False
+        self.value = None
 
         self.map = definition['map'] if 'map' in definition else None
         self.data = definition['data'] if 'data' in definition else None
@@ -70,6 +72,15 @@ class Setting:
             self.default = definition['default'] if 'default' in definition else None
         elif self.backend == 'environment':
             self.key = definition['key']
+        elif self.backend == 'sysfs':
+            if not os.path.isfile(definition['key']):
+                self.valid = False
+                return
+
+            self.needs_root = True
+            self.key = definition['key']
+            self.stype = definition['stype']
+            self.multiplier = definition['multiplier'] if 'multiplier' in definition else 1
 
     def connect(self, callback):
         self.callback = callback
@@ -91,13 +102,19 @@ class Setting:
                 value = self._settings.get_double(self.key)
         elif self.backend == 'gtk3settings':
             if os.path.isfile(self.file):
-                ini = configparser.SafeConfigParser()
+                ini = configparser.ConfigParser()
                 ini.read(self.file)
                 value = ini.get('Settings', self.key)
             else:
                 value = self.default
         elif self.backend == 'environment':
             value = os.getenv(self.key, default='')
+        elif self.backend == 'sysfs':
+            with open(self.key, 'r') as handle:
+                raw = handle.read()
+            if self.stype == 'int':
+                value = int(raw) / self.multiplier
+            self.value = value
 
         if self.map:
             for key in self.map:
@@ -118,6 +135,7 @@ class Setting:
                 self._settings.set_int(self.key, value)
             elif self.gtype == 'double':
                 self._settings.set_double(self.key, value)
+
         elif self.backend == 'gtk3settings':
             ini = configparser.SafeConfigParser()
             if os.path.isfile(self.file):
@@ -126,6 +144,7 @@ class Setting:
             os.makedirs(os.path.dirname(self.file), exist_ok=True)
             with open(self.file, 'w') as handle:
                 ini.write(handle)
+
         elif self.backend == 'environment':
             file = os.path.expanduser('~/.pam_environment')
             lines = []
@@ -142,6 +161,10 @@ class Setting:
 
             with open(file, 'w') as handle:
                 handle.writelines(lines)
+
+        elif self.backend == 'sysfs':
+            if self.stype == 'int':
+                self.value = value
 
     def create_map_from_data(self):
         if self.data == 'gtk3themes':
@@ -161,7 +184,7 @@ class Setting:
                 name = theme
                 metafile = os.path.join('/usr/share/themes', theme, 'index.theme')
                 if os.path.isfile(metafile):
-                    p = configparser.SafeConfigParser()
+                    p = configparser.ConfigParser()
                     p.read(metafile)
                     if p.has_section('X-GNOME-Metatheme'):
                         name = p.get('X-GNOME-Metatheme', 'name', fallback=name)
@@ -251,3 +274,21 @@ class SettingsTree:
             for section in self.settings[page]['sections']:
                 self.settings[page]['sections'][section]['settings'] = self._sort_weight(
                     self.settings[page]['sections'][section]['settings'])
+
+    def save_tweakd_config(self, fp):
+        needs_saving = []
+        for page in self.settings:
+            for section in self.settings[page]['sections']:
+                for setting in self.settings[page]['sections'][section]['settings']:
+                    s = self.settings[page]['sections'][section]['settings'][setting]
+                    if s.needs_root:
+                        needs_saving.append(s)
+
+        result = configparser.ConfigParser()
+        for setting in needs_saving:
+            if setting.backend == 'sysfs':
+                if not result.has_section('sysfs'):
+                    result.add_section('sysfs')
+                result.set('sysfs', setting.key, str(int(setting.value * setting.multiplier)))
+
+        result.write(fp)

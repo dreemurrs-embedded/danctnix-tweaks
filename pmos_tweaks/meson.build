@@ -19,11 +19,25 @@ configure_file(
     install_dir: get_option('bindir')
 )
 
+configure_file(
+    input: 'pmos-tweakd.in',
+    output: 'pmos-tweakd',
+    configuration: conf,
+    install: true,
+    install_dir: get_option('bindir')
+)
+
 sources = [
     '__init__.py',
     '__main__.py',
     'window.py',
     'settingstree.py',
+    'tweakd.py'
 ]
 
 install_data(sources, install_dir: moduledir)
+
+install_data('pk-tweaks-action.sh',
+    install_dir: get_option('bindir'),
+    install_mode: 'rwxr-xr-x',
+    rename: ['pk-tweaks-action'])
