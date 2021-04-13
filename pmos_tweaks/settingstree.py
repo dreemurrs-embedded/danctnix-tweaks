@@ -207,7 +207,7 @@ class Setting:
                 theme = os.path.basename(themedir)
                 name = os.path.basename(themedir)
                 metafile = os.path.join(themedir, 'index.theme')
-                p = configparser.SafeConfigParser()
+                p = configparser.ConfigParser(strict=False)
                 p.read(metafile)
                 if p.has_section('Icon Theme'):
                     name = p.get('Icon Theme', 'Name', fallback=name)
