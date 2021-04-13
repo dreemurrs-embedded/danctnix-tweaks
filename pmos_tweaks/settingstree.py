@@ -184,7 +184,7 @@ class Setting:
                 name = theme
                 metafile = os.path.join('/usr/share/themes', theme, 'index.theme')
                 if os.path.isfile(metafile):
-                    p = configparser.ConfigParser()
+                    p = configparser.ConfigParser(strict=False)
                     p.read(metafile)
                     if p.has_section('X-GNOME-Metatheme'):
                         name = p.get('X-GNOME-Metatheme', 'name', fallback=name)
@@ -194,14 +194,19 @@ class Setting:
                 self.map[name] = theme
         elif self.data == 'iconthemes':
             result = []
+            for dir in glob.glob(os.path.expanduser('~/.local/share/icons/*')):
+                if os.path.isfile(os.path.join(dir, 'index.theme')):
+                    result.append(dir)
+
             for dir in glob.glob('/usr/share/icons/*'):
                 if os.path.isfile(os.path.join(dir, 'index.theme')):
-                    result.append(os.path.basename(dir))
+                    result.append(dir)
 
             self.map = {}
-            for theme in sorted(result):
-                name = theme
-                metafile = os.path.join('/usr/share/icons', theme, 'index.theme')
+            for themedir in sorted(result):
+                theme = os.path.basename(themedir)
+                name = os.path.basename(themedir)
+                metafile = os.path.join(themedir, 'index.theme')
                 p = configparser.SafeConfigParser()
                 p.read(metafile)
                 if p.has_section('Icon Theme'):
