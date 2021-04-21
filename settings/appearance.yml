@@ -16,6 +16,7 @@
         - name: Theme
           type: choice
           backend: gsettings
+          default: Adwaita
           help: The theme for GTK3 applications
           gtype: string
           key: org.gnome.desktop.interface.gtk-theme
@@ -23,6 +24,7 @@
         - name: Icons
           type: choice
           backend: gsettings
+          default: Adwaita
           help: The icon theme for GTK3 applications
           gtype: string
           key: org.gnome.desktop.interface.icon-theme
