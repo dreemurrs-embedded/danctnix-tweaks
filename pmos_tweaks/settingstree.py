@@ -137,9 +137,11 @@ class Setting:
                 self._settings.set_double(self.key, value)
 
         elif self.backend == 'gtk3settings':
-            ini = configparser.SafeConfigParser()
+            ini = configparser.ConfigParser()
             if os.path.isfile(self.file):
                 ini.read(self.file)
+            if 'Settings' not in ini:
+                ini['Settings'] = {}
             ini.set('Settings', self.key, value)
             os.makedirs(os.path.dirname(self.file), exist_ok=True)
             with open(self.file, 'w') as handle:
