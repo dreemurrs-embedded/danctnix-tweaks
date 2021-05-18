@@ -170,13 +170,15 @@ class Setting:
 
     def create_map_from_data(self):
         if self.data == 'gtk3themes':
-            result = []
             gtk_ver = Gtk.MINOR_VERSION
             if gtk_ver % 2:
                 gtk_ver += 1
             gtk_ver = f'3.{gtk_ver}'
 
-            for dir in glob.glob('/usr/share/themes/*'):
+            result = []
+            theme_dirs = glob.glob('/usr/share/themes/*') + \
+                         glob.glob(os.path.expanduser('~/.local/share/themes/*'))
+            for dir in theme_dirs:
                 if os.path.isfile(os.path.join(dir, 'gtk-3.0/gtk.css')):
                     result.append(os.path.basename(dir))
                 elif os.path.isdir(os.path.join(dir, f'gtk-{gtk_ver}')):
@@ -196,14 +198,11 @@ class Setting:
                 self.map[name] = theme
         elif self.data == 'iconthemes':
             result = []
-            for dir in glob.glob(os.path.expanduser('~/.local/share/icons/*')):
+            theme_dirs = glob.glob('/usr/share/icons/*') + \
+                         glob.glob(os.path.expanduser('~/.local/share/icons/*'))
+            for dir in theme_dirs:
                 if os.path.isfile(os.path.join(dir, 'index.theme')):
                     result.append(dir)
-
-            for dir in glob.glob('/usr/share/icons/*'):
-                if os.path.isfile(os.path.join(dir, 'index.theme')):
-                    result.append(dir)
-
             self.map = {}
             for themedir in sorted(result):
                 theme = os.path.basename(themedir)
