@@ -1,0 +1,109 @@
+- name: Disk unlocker
+  weight: 30
+  sections:
+    - name: Unlocker
+      weight: 10
+      settings:
+        - name: Background color
+          type: color
+          backend: osksdl
+          key: wallpaper
+          default: "#000000"
+        - name: Password box color
+          type: color
+          backend: osksdl
+          key: input-foreground
+          default: "#FFFFFF"
+        - name: Password text color
+          type: color
+          backend: osksdl
+          key: input-background
+          default: "#32363E"
+        - name: Error background color
+          type: color
+          backend: osksdl
+          key: input-foreground-error
+          default: "#7E141A"
+        - name: Error text error
+          type: color
+          backend: osksdl
+          key: input-background
+          default: "#E76A63"
+        - name: Rounded corner radius
+          type: number
+          min: 0
+          max: 100
+          step: 1
+          backend: osksdl
+          key: inputbox-radius
+          default: 0
+          help: Radius, in pixels, for rounding corners of input box. A value of 0 disables rounded corners.
+
+    - name: Keyboard
+      weight: 10
+      settings:
+        - name: Background
+          type: color
+          backend: osksdl
+          key: keyboard-background
+          default: "#0E0E12"
+        - name: Text
+          type: color
+          backend: osksdl
+          key: key-foreground
+          default: "#FFFFFF"
+        - name: Highlighted text
+          type: color
+          backend: osksdl
+          key: key-foreground-highlighted
+          default: "#0E0E12"
+        - name: Highlighted background
+          type: color
+          backend: osksdl
+          key: key-background-highlighted
+          default: "#FFFFFF"
+        - name: Return background
+          type: color
+          backend: osksdl
+          key: key-background-return
+          default: "#003C00"
+        - name: Other background
+          type: color
+          backend: osksdl
+          key: key-background-other
+          default: "#32363E"
+        - name: Rounded corner radius
+          type: number
+          min: 0
+          max: 100
+          step: 1
+          backend: osksdl
+          key: key-radius
+          default: 0
+          help: Radius, in pixels, for rounding corners of keyboard key caps. A value of 0 disables rounded corners.
+        - name: Key popups
+          type: boolean
+          backend: osksdl
+          key: key-preview-popup
+          default: true
+          help: Enables or disables the preview popup when a key on the keyboard is touched.
+
+    - name: Settings
+      weight: 0
+      settings:
+        - name: Animations
+          type: boolean
+          backend: osksdl
+          key: animations
+          default: true
+          help: Enables or disables animations in the application. Disabling animations might help with making the application
+            more responsive on certain devices.
+        - name: Key vibration
+          type: number
+          min: 0
+          max: 1000
+          step: 10
+          backend: osksdl
+          key: key-vibrate-duration
+          default: 100
+          help: Duration, in milliseconds, for haptic vibration on key press.

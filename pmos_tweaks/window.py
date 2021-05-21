@@ -198,6 +198,17 @@ class TweaksWindow:
                         widget.connect('font-set', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
+                    elif setting.type == 'color':
+                        widget = Gtk.ColorButton()
+                        setting.widget = widget
+                        widget.setting = setting
+                        value = setting.get_value()
+                        if value.startswith('#'):
+                            color = Gdk.color_parse(value)
+                            widget.set_color(color)
+                        widget.connect('color-set', self.on_widget_changed)
+                        setting.connect(self.on_setting_change)
+                        wbox.pack_start(widget, False, False, 0)
                     elif setting.type == 'number':
                         value = setting.get_value()
                         if 'percentage' in setting.definition and setting.definition['percentage']:
@@ -253,6 +264,10 @@ class TweaksWindow:
             if 'percentage' in setting.definition and setting.definition['percentage']:
                 val_range = setting.definition['max'] - setting.definition['min']
                 value = (value / 100 * val_range) + setting.definition['min']
+            setting.set_value(value)
+        elif setting.type == 'color':
+            value = widget.get_color().to_string()
+            value = '#'+value[1:3]+value[5:7]+value[9:11]
             setting.set_value(value)
 
     def on_select_page(self, widget, row):

@@ -81,6 +81,10 @@ class Setting:
             self.key = definition['key']
             self.stype = definition['stype']
             self.multiplier = definition['multiplier'] if 'multiplier' in definition else 1
+        elif self.backend == 'osksdl':
+            self.needs_root = True
+            self.key = definition['key']
+            self.default = definition['default']
 
     def connect(self, callback):
         self.callback = callback
@@ -115,6 +119,8 @@ class Setting:
             if self.stype == 'int':
                 value = int(raw) / self.multiplier
             self.value = value
+        elif self.backend == 'osksdl':
+            value = self.osksdl_read(self.key)
 
         if self.map:
             for key in self.map:
@@ -167,6 +173,11 @@ class Setting:
         elif self.backend == 'sysfs':
             if self.stype == 'int':
                 self.value = value
+
+        elif self.backend == 'osksdl':
+            if isinstance(value, float):
+                value = int(value)
+            self.value = value
 
     def create_map_from_data(self):
         if self.data == 'gtk3themes':
@@ -222,6 +233,16 @@ class Setting:
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+    def osksdl_read(self, key):
+        if not os.path.isfile('/boot/osk.conf'):
+            return self.default
+
+        with open('/boot/osk.conf') as handle:
+            for line in handle.readlines():
+                if line.startswith(f"{self.key} = "):
+                    return line.split(' = ')[1].strip()
+        return self.default
 
 
 class SettingsTree:
@@ -296,5 +317,10 @@ class SettingsTree:
                 if not result.has_section('sysfs'):
                     result.add_section('sysfs')
                 result.set('sysfs', setting.key, str(int(setting.value * setting.multiplier)))
+            if setting.backend == 'osksdl':
+                if not result.has_section('osksdl'):
+                    result.add_section('osksdl')
+                if setting.value is not None:
+                    result.set('osksdl', setting.key, str(setting.value))
 
         result.write(fp)
