@@ -5,13 +5,14 @@
       weight: 10
       settings:
         - name: Maximum charge level
-          type: number
-          min: 3.0
-          max: 4.35
-          step: 0.05
-          percentage: true
+          type: choice
+          map:
+            80% (4.10V): 4100000
+            85% (4.15V): 4150000
+            90% (4.20V): 4200000
+            100% (4.35V): 4350000
           help: Limit the maximum level of charge for the battery which increases battery durability.
           backend: sysfs
           key: /sys/class/power_supply/axp20x-battery/voltage_max_design
           stype: int
-          multiplier: 1000000
+          multiplier: 1
