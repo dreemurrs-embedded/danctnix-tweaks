@@ -46,6 +46,7 @@ class TweaksWindow:
 
     def create_window(self):
         self.window = Handy.Window()
+        self.window.set_default_size(640, 480)
         self.window.set_title('postmarketOS Tweaks')
         self.window.connect('destroy', self.on_main_window_destroy)
 
