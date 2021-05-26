@@ -1,0 +1,54 @@
+- name: About
+  weight: 9999
+  sections:
+    - name: Hardware
+      weight: 0
+      settings:
+        - name: Hardware model
+          weight: 10
+          type: info
+          backend: hardwareinfo
+          key: model
+        - name: Memory
+          weight: 20
+          type: info
+          backend: hardwareinfo
+          key: memory
+        - name: Processor
+          weight: 30
+          type: info
+          backend: hardwareinfo
+          key: cpu
+        - name: Chipset
+          weight: 40
+          type: info
+          backend: hardwareinfo
+          key: chipset
+        - name: Graphics
+          weight: 50
+          type: info
+          backend: hardwareinfo
+          key: gpu
+        - name: Disk
+          weight: 60
+          type: info
+          backend: hardwareinfo
+          key: disk
+    - name: Software
+      weight: 100
+      settings:
+        - name: Kernel
+          weight: 20
+          type: info
+          backend: hardwareinfo
+          key: kernel
+        - name: Architecture
+          weight: 10
+          type: info
+          backend: hardwareinfo
+          key: architecture
+        - name: Distro
+          weight: 30
+          type: info
+          backend: hardwareinfo
+          key: distro

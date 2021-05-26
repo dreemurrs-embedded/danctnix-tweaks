@@ -16,3 +16,13 @@
           key: /sys/class/power_supply/axp20x-battery/voltage_max_design
           stype: int
           multiplier: 1
+- name: About
+  weight: 9999
+  sections:
+    - name: Hardware
+      settings:
+        - name: Memory speed
+          weight: 25
+          type: info
+          backend: sysfs
+          key: /sys/firmware/devicetree/base/memory/ram_freq

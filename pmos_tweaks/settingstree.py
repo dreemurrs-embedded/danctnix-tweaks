@@ -1,7 +1,11 @@
 import os
 import glob
+import subprocess
 from collections import OrderedDict
 import configparser
+import platform
+
+import pmos_tweaks.cpus as cpu_data
 
 import yaml
 
@@ -85,6 +89,8 @@ class Setting:
             self.needs_root = True
             self.key = definition['key']
             self.default = definition['default']
+        elif self.backend == 'hardwareinfo':
+            self.key = definition['key']
 
     def connect(self, callback):
         self.callback = callback
@@ -117,10 +123,15 @@ class Setting:
             with open(self.key, 'r') as handle:
                 raw = handle.read()
             if self.stype == 'int':
-                value = int(raw) / self.multiplier
+                try:
+                    value = int(raw) / self.multiplier
+                except ValueError:
+                    value = 0
             self.value = value
         elif self.backend == 'osksdl':
             value = self.osksdl_read(self.key)
+        elif self.backend == 'hardwareinfo':
+            value = self.hardware_info(self.key)
 
         if self.map:
             for key in self.map:
@@ -243,6 +254,144 @@ class Setting:
                 if line.startswith(f"{self.key} = "):
                     return line.split(' = ')[1].strip()
         return self.default
+
+    def get_file_contents(self, path):
+        if not os.path.isfile(path):
+            return None
+        try:
+            with open(path, 'r') as handle:
+                return handle.read().strip()
+        except:
+            return None
+
+    def hardware_info(self, key):
+        GB = 1024 * 1024 * 1024
+
+        if key == 'model':
+            dmidir = '/sys/devices/virtual/dmi/id'
+            if os.path.isdir(dmidir):
+                manufacturer = self.get_file_contents(os.path.join(dmidir, 'chassis_vendor')) or ''
+                model = self.get_file_contents(os.path.join(dmidir, 'product_name')) or ''
+                return '{} {}'.format(manufacturer, model).strip()
+            if os.path.isdir('/proc/device-tree'):
+                return self.get_file_contents('/proc/device-tree/model')
+        elif key == 'memory':
+            memdir = '/sys/devices/system/memory'
+            if os.path.isdir(memdir):
+                blocks = 0
+                for block in glob.glob(os.path.join(memdir, 'memory*/online')):
+                    blocks += 1
+                blocksize = self.get_file_contents(os.path.join(memdir, 'block_size_bytes'))
+                blocksize_byes = int(blocksize, 16)
+                memory_bytes = blocks * blocksize_byes
+            else:
+                meminfo = dict((i.split()[0].rstrip(':'), int(i.split()[1])) for i in open('/proc/meminfo').readlines())
+                mem_kib = meminfo['MemTotal']
+                memory_bytes = mem_kib * 1024
+            if memory_bytes > GB:
+                return "{:.1f} GB".format(memory_bytes / GB)
+            else:
+                return "{:.0f} MB".format(memory_bytes / GB * 1024)
+
+        elif key == 'cpu':
+            return self.hardware_info_cpus()
+        elif key == 'chipset':
+            return self.hardware_info_chipset()
+        elif key == 'disk':
+            stats = os.statvfs('/')
+            total_bytes = stats.f_frsize * stats.f_blocks
+            disk_size = total_bytes / GB
+            return str(round(disk_size, 2)) + " GB"
+        elif key == 'gpu':
+            paths = ['/usr/libexec/gnome-control-center-print-renderer',
+                     '/usr/lib/gnome-control-center-print-renderer']
+            for path in paths:
+                if not os.path.isfile(path):
+                    continue
+                try:
+                    result = subprocess.check_output([path]).decode().strip()
+                    return result
+                except Exception as e:
+                    print(e)
+        elif key == 'kernel':
+            return platform.release()
+        elif key == 'architecture':
+            lut = {
+                'aarch64': 'ARM64'
+            }
+            arch = platform.machine()
+            if arch in lut:
+                return lut[arch]
+            else:
+                return arch
+        elif key == 'distro':
+            if os.path.isfile('/etc/os-release'):
+                with open('/etc/os-release') as handle:
+                    raw = handle.read()
+                for line in raw.splitlines():
+                    if line.startswith("PRETTY_NAME="):
+                        return line.split('=', maxsplit=1)[1].replace('"', '').strip()
+        return 'N/A'
+
+    def hardware_info_cpus(self):
+        cpus = {}
+        raw = self.get_file_contents('/proc/cpuinfo')
+        buffer = {}
+        arm_names = [
+            'CPU implementer',
+            'CPU architecture',
+            'CPU variant',
+            'CPU part',
+            'CPU revision',
+        ]
+        for line in list(raw.splitlines()) + [""]:
+            if line.strip() == '':
+                if 'CPU implementer' in buffer:
+                    implementer = int(buffer['CPU implementer'], 16)
+                    part = int(buffer['CPU part'], 16)
+                    if implementer in cpu_data.arm_implementer:
+                        model = cpu_data.arm_implementer[implementer]
+                        if part in cpu_data.arm_part[implementer]:
+                            model += ' ' + cpu_data.arm_part[implementer][part]
+                        else:
+                            model += ' unknown core'
+                    else:
+                        model = 'unknown cpu'
+                    if model in cpus:
+                        cpus[model] += 1
+                    else:
+                        cpus[model] = 1
+                buffer = {}
+            if line.startswith('model name'):
+                _, val = line.split(':')
+                name = val.strip()
+                if name in cpus:
+                    cpus[name] += 1
+                else:
+                    cpus[name] = 1
+            for field in arm_names:
+                if line.startswith(field):
+                    key, val = line.split(':')
+                    buffer[key.strip()] = val.strip()
+
+        result = ''
+        for cpu in cpus:
+            result += f'{cpus[cpu]}x {cpu}\n'
+        return result.strip()
+
+    def hardware_info_chipset(self):
+        # Qualcomm / socinfocoo
+        if os.path.isdir('/sys/devices/soc0'):
+            machine = self.get_file_contents('/sys/devices/soc0/machine')
+            family = self.get_file_contents('/sys/devices/soc0/family')
+            if machine is not None:
+                if family is None:
+                    return machine
+                else:
+                    return f"{family} {machine}"
+
+        # Allwinner
+        return "N/A"
 
 
 class SettingsTree:

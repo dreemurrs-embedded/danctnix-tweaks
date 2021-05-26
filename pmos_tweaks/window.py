@@ -8,7 +8,7 @@ import gi
 from pmos_tweaks.settingstree import SettingsTree
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib, GObject, Gio, Gdk, GLib
+from gi.repository import Gtk, GLib, GObject, Gio, Gdk, GLib, Pango
 
 gi.require_version('Handy', '1')
 from gi.repository import Handy
@@ -173,6 +173,12 @@ class TweaksWindow:
                         widget.connect('notify::active', self.on_widget_changed)
 
                         setting.connect(self.on_setting_change)
+                        wbox.pack_start(widget, False, False, 0)
+                    elif setting.type == 'info':
+                        widget = Gtk.Label(label=setting.get_value())
+                        widget.set_xalign(0.0)
+                        widget.get_style_context().add_class('dim-label')
+                        widget.set_ellipsize(Pango.EllipsizeMode.MIDDLE)
                         wbox.pack_start(widget, False, False, 0)
                     elif setting.type == 'choice':
                         widget = Gtk.ComboBoxText()
