@@ -124,7 +124,7 @@ class Setting:
                 raw = handle.read()
             if self.stype == 'int':
                 try:
-                    value = int(raw) / self.multiplier
+                    value = int(raw.rstrip('\0')) / self.multiplier
                 except ValueError:
                     value = 0
             self.value = value
