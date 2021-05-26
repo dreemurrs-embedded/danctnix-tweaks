@@ -32,7 +32,8 @@ sources = [
     '__main__.py',
     'window.py',
     'settingstree.py',
-    'tweakd.py'
+    'tweakd.py',
+    'cpus.py',
 ]
 
 install_data(sources, install_dir: moduledir)
