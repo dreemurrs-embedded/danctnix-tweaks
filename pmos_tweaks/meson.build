@@ -34,6 +34,7 @@ sources = [
     'settingstree.py',
     'tweakd.py',
     'cpus.py',
+    'socs.py',
 ]
 
 install_data(sources, install_dir: moduledir)

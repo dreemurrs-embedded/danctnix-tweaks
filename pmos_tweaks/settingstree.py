@@ -6,6 +6,7 @@ import configparser
 import platform
 
 import pmos_tweaks.cpus as cpu_data
+import pmos_tweaks.socs as soc_data
 
 import yaml
 
@@ -380,7 +381,7 @@ class Setting:
         return result.strip()
 
     def hardware_info_chipset(self):
-        # Qualcomm / socinfocoo
+        # Qualcomm / socinfo
         if os.path.isdir('/sys/devices/soc0'):
             machine = self.get_file_contents('/sys/devices/soc0/machine')
             family = self.get_file_contents('/sys/devices/soc0/family')
@@ -390,7 +391,12 @@ class Setting:
                 else:
                     return f"{family} {machine}"
 
-        # Allwinner
+        # Guess based on the device tree
+        if os.path.isdir('/proc/device-tree'):
+            compatible = self.get_file_contents('/proc/device-tree/compatible')
+            part = compatible.rstrip('\0').split('\0')
+            manufacturer, part = part[-1].split(',', maxsplit=1)
+            return soc_data.get_soc_name(manufacturer, part)
         return "N/A"
 
 
