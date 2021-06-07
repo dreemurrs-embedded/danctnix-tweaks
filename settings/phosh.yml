@@ -16,6 +16,13 @@
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.clock-show-seconds
+    - name: Battery
+      weight: 10
+      settings:
+        - name: Show percentage
+          type: boolean
+          backend: gsettings
+          key: org.gnome.desktop.interface.show-battery-percentage
     - name: Performance
       weight: 20
       settings:
