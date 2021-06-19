@@ -1,0 +1,5 @@
+#!/sbin/openrc-run
+
+name=$RC_SVCNAME
+description="DanctNIX tweaks daeamon"
+command="/usr/bin/danctnix-tweakd"

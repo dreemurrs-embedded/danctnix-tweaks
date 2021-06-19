@@ -1,5 +1,5 @@
 pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
-moduledir = join_paths(pkgdatadir, 'pmos_tweaks')
+moduledir = join_paths(pkgdatadir, 'danctnix_tweaks')
 gnome = import('gnome')
 
 python = import('python')
@@ -12,16 +12,16 @@ conf.set('pkgdatadir', pkgdatadir)
 conf.set('datadir', join_paths(get_option('prefix'), get_option('datadir')))
 
 configure_file(
-    input: 'pmos-tweaks.in',
-    output: 'pmos-tweaks',
+    input: 'danctnix-tweaks.in',
+    output: 'danctnix-tweaks',
     configuration: conf,
     install: true,
     install_dir: get_option('bindir')
 )
 
 configure_file(
-    input: 'pmos-tweakd.in',
-    output: 'pmos-tweakd',
+    input: 'danctnix-tweakd.in',
+    output: 'danctnix-tweakd',
     configuration: conf,
     install: true,
     install_dir: get_option('bindir')

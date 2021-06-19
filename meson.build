@@ -1,4 +1,4 @@
-project('pmos-tweaks',
+project('danctnix-tweaks',
     version: '0.1.0',
     meson_version: '>= 0.50.0',
     default_options: ['warning_level=2'])
@@ -6,10 +6,10 @@ project('pmos-tweaks',
 dependency('libhandy-1', version: '>=1.0.0')
 
 subdir('data')
-subdir('pmos_tweaks')
+subdir('danctnix_tweaks')
 
 install_subdir('settings',
-        install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'postmarketos-tweaks'),
+        install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'danctnix-tweaks'),
         strip_directory: true)
 
 meson.add_install_script('build-aux/meson/postinstall.py')

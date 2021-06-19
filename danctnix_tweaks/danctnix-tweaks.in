@@ -17,5 +17,5 @@ if __name__ == '__main__':
     import gi
     from gi.repository import Gio
 
-    from pmos_tweaks import __main__
+    from danctnix_tweaks import __main__
     sys.exit(__main__.main(VERSION, datadir=datadir))

@@ -5,8 +5,8 @@ from collections import OrderedDict
 import configparser
 import platform
 
-import pmos_tweaks.cpus as cpu_data
-import pmos_tweaks.socs as soc_data
+import danctnix_tweaks.cpus as cpu_data
+import danctnix_tweaks.socs as soc_data
 
 import yaml
 

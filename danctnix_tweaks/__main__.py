@@ -2,7 +2,7 @@ import argparse
 import os
 import gi
 
-from pmos_tweaks.window import TweaksWindow
+from danctnix_tweaks.window import TweaksWindow
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
@@ -23,7 +23,7 @@ class TweaksApplication(Gtk.Application):
 
 def main(version, datadir=None):
     Handy.init()
-    app = TweaksApplication("org.postmarketos.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
+    app = TweaksApplication("org.danctnix.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
     app.run()
 
 

@@ -1,5 +1,0 @@
-#!/sbin/openrc-run
-
-name=$RC_SVCNAME
-description="postmarketOS tweaks daeamon"
-command="/usr/bin/pmos-tweakd"

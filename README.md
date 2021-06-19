@@ -1,3 +1,5 @@
+This is a rebrand of postmarketOS tweaks for use in DanctNIX Arch Linux fork.
+
 # postmarketOS tweaks
 
 This is a mobile gtk3 application for tweaking settings on desktop environments supported by postmarketOS. 

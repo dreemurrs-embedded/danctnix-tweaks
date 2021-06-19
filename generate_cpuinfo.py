@@ -37,5 +37,5 @@ for implementer in implementers:
     result += '    },\n'
 result += '}\n'
 
-with open('pmos_tweaks/cpus.py', 'w') as handle:
+with open('danctnix_tweaks/cpus.py', 'w') as handle:
     handle.write(result)

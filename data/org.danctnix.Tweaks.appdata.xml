@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2021 Martijn Braam -->
 <component type="desktop-application">
-    <id>org.postmarketos.Tweaks</id>
+    <id>org.danctnix.Tweaks</id>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0</project_license>
-    <name>postmarketOS Tweaks</name>
+    <name>DanctNIX Tweaks</name>
     <summary>Mobile settings tweak application</summary>
     <description>
         <p>
             A Gnome-Tweaks like application for modifying phone settings
         </p>
     </description>
-    <launchable type="desktop-id">org.postmarketos.Tweaks.desktop</launchable>
+    <launchable type="desktop-id">org.danctnix.Tweaks.desktop</launchable>
     <provides>
-        <binary>pmos-tweaks</binary>
+        <binary>danctnix-tweaks</binary>
     </provides>
     <screenshots>
         <screenshot type="default">

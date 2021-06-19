@@ -4,12 +4,12 @@
  "http://www.freedesktop.org/software/polkit/policyconfig-1.dtd">
 <policyconfig>
 
-  <vendor>postmarketOS Tweaks</vendor>
+  <vendor>DanctNIX Tweaks</vendor>
 
-  <action id="org.postmarketos.Tweaks.pkexec.apply">
+  <action id="org.danctnix.Tweaks.pkexec.apply">
     <description>Apply settings</description>
     <message>Authentication is required to apply the settings</message>
-    <icon_name>org.postmarketos.Tweaks</icon_name>
+    <icon_name>org.danctnix.Tweaks</icon_name>
     <defaults>
       <allow_any>auth_admin_keep</allow_any>
       <allow_inactive>auth_admin_keep</allow_inactive>

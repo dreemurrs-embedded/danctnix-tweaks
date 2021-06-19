@@ -5,7 +5,7 @@ import time
 
 import gi
 
-from pmos_tweaks.settingstree import SettingsTree
+from danctnix_tweaks.settingstree import SettingsTree
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib, GObject, Gio, Gdk, GLib, Pango
@@ -35,8 +35,8 @@ class TweaksWindow:
 
         self.settings = SettingsTree()
         if datadir:
-            self.settings.load_dir(os.path.join(datadir, 'postmarketos-tweaks'))
-        self.settings.load_dir('/etc/postmarketos-tweaks')
+            self.settings.load_dir(os.path.join(datadir, 'danctnix-tweaks'))
+        self.settings.load_dir('/etc/danctnix-tweaks')
         self.settings.load_dir('settings')
         self.settings.load_dir('../settings')
 
@@ -47,14 +47,14 @@ class TweaksWindow:
     def create_window(self):
         self.window = Handy.Window()
         self.window.set_default_size(640, 480)
-        self.window.set_title('postmarketOS Tweaks')
+        self.window.set_title('DanctNIX Tweaks')
         self.window.connect('destroy', self.on_main_window_destroy)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.window.add(box)
 
         self.headerbar = Handy.HeaderBar()
-        self.headerbar.set_title("postmarketOS Tweaks")
+        self.headerbar.set_title("DanctNIX Tweaks")
         self.headerbar.set_show_close_button(True)
 
         self.back = Gtk.Button.new_from_icon_name("go-previous-symbolic", 1)

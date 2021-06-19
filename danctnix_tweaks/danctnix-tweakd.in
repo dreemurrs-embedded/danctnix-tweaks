@@ -14,5 +14,5 @@ sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 if __name__ == '__main__':
-    from pmos_tweaks import tweakd
+    from danctnix_tweaks import tweakd
     sys.exit(tweakd.main(VERSION, datadir=datadir))
