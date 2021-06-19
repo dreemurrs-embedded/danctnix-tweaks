@@ -8,4 +8,4 @@
 
 mkdir -p "/etc/danctnix-tweaks"
 mv "$1" "/etc/danctnix-tweaks/tweakd.conf"
-service danctnix-tweakd restart
+systemctl restart danctnix-tweakd

@@ -1,0 +1,9 @@
+[Unit]
+Description=DanctNIX Tweaks Daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/danctnix-tweakd
+
+[Install]
+WantedBy=multi-user.target
