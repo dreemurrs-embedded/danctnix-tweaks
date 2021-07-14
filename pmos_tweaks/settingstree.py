@@ -10,18 +10,14 @@ import pmos_tweaks.socs as soc_data
 
 import yaml
 
-import gi
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk
-
 
 # Needed for qt5 theming, disabled because qt5 theming is a mess
 # from PyQt5 import QtWidgets
 
 
 class Setting:
-    def __init__(self, definition):
+    def __init__(self, definition, daemon=False):
+        self.daemon = daemon
         self.name = definition['name']
         self.weight = 50
         if 'weight' in definition:
@@ -43,7 +39,7 @@ class Setting:
         if self.data:
             self.create_map_from_data()
 
-        if self.backend == 'gsettings':
+        if self.backend == 'gsettings' and not self.daemon:
             self.gtype = definition['gtype'] if 'gtype' in definition else definition['type']
 
             if not isinstance(self.definition['key'], list):
@@ -52,6 +48,10 @@ class Setting:
                 part = key.split('.')
                 self.base_key = '.'.join(part[0:-1])
                 self.key = part[-1]
+                import gi
+
+                gi.require_version('Gtk', '3.0')
+                from gi.repository import Gio
 
                 source = Gio.SettingsSchemaSource.get_default()
                 if source.lookup(self.base_key, True) is None:
@@ -69,7 +69,9 @@ class Setting:
                 return
 
             self._settings.connect(f'changed::{self.key}', self._callback)
-
+        elif self.backend == 'gsettings':
+            self.valid = False
+            return
         elif self.backend == 'gtk3settings':
             self.key = definition['key']
             self.file = os.path.join(os.getenv('XDG_CONFIG_HOME', '~/.config'), 'gtk-3.0/settings.ini')
@@ -192,7 +194,11 @@ class Setting:
             self.value = value
 
     def create_map_from_data(self):
-        if self.data == 'gtk3themes':
+        if self.data == 'gtk3themes' and not self.daemon:
+            import gi
+
+            gi.require_version('Gtk', '3.0')
+            from gi.repository import Gtk
             gtk_ver = Gtk.MINOR_VERSION
             if gtk_ver % 2:
                 gtk_ver += 1
@@ -401,7 +407,8 @@ class Setting:
 
 
 class SettingsTree:
-    def __init__(self):
+    def __init__(self, daemon=False):
+        self.daemon = daemon
         self.settings = OrderedDict()
 
     def _sort_weight(self, unsorted):
