@@ -94,6 +94,16 @@ class Setting:
             self.default = definition['default']
         elif self.backend == 'hardwareinfo':
             self.key = definition['key']
+        elif self.backend == 'css':
+            self.key = definition['key']
+            self.selector = definition['selector']
+            self.rules = definition['css']
+            guard = definition['guard']
+            self.guard_start = f'/* TWEAKS-START {guard} */'
+            self.guard_end = f'/* TWEAKS-END {guard} */'
+            for rule in self.rules:
+                if self.rules[rule] == '%':
+                    self.primary = rule
 
     def connect(self, callback):
         self.callback = callback
@@ -135,6 +145,28 @@ class Setting:
             value = self.osksdl_read(self.key)
         elif self.backend == 'hardwareinfo':
             value = self.hardware_info(self.key)
+        elif self.backend == 'css':
+            filename = os.path.expanduser(self.key)
+            if os.path.isfile(filename):
+                with open(filename) as handle:
+                    raw = handle.read()
+                if self.guard_start not in raw:
+                    value = None
+                else:
+                    in_block = False
+                    for line in raw.splitlines():
+                        if in_block:
+                            if line.strip().startswith(self.primary):
+                                key, val = line.strip().split(':', maxsplit=1)
+                                value = val.strip()[:-1]
+                                if value.startswith('url('):
+                                    value = value[11:-1]
+                        if line.startswith(self.guard_start):
+                            in_block = True
+                        elif line.startswith(self.guard_end):
+                            in_block = False
+            else:
+                value = None
 
         if self.map:
             for key in self.map:
@@ -192,6 +224,60 @@ class Setting:
             if isinstance(value, float):
                 value = int(value)
             self.value = value
+
+        elif self.backend == 'css':
+            clear = False
+            if value is None:
+                clear = True
+            if value is not None and value.startswith('/'):
+                value = f'url(file://{value})'
+            filename = os.path.expanduser(self.key)
+            raw = []
+            if os.path.isfile(filename):
+                with open(filename) as handle:
+                    raw = list(handle.readlines())
+
+            result = []
+            found = False
+            ignore = False
+            for line in raw:
+                if line.strip() == self.guard_end:
+                    ignore = False
+                    if clear:
+                        continue
+
+                if clear and line.strip() == self.guard_start:
+                    ignore = True
+                    continue
+                    
+                if not ignore:
+                    result.append(line)
+
+                if line.strip() == self.guard_start:
+                    found = True
+                    ignore = True
+
+                    result.append(self.selector + ' {\n')
+                    for rule in self.rules:
+                        val = self.rules[rule]
+                        if val == '%':
+                            val = value
+                        result.append('\t' + rule + ': ' + val + ';\n')
+                    result.append('}\n')
+
+            if not found and not clear:
+                result.append(self.guard_start + '\n')
+                result.append(self.selector + ' {\n')
+                for rule in self.rules:
+                    val = self.rules[rule]
+                    if val == '%':
+                        val = value
+                    result.append('\t' + rule + ': ' + val + ';\n')
+                result.append('}\n')
+                result.append(self.guard_end + '\n')
+
+            with open(filename, 'w') as handle:
+                handle.writelines(result)
 
     def create_map_from_data(self):
         if self.data == 'gtk3themes' and not self.daemon:

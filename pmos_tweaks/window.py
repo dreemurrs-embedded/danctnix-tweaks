@@ -205,6 +205,28 @@ class TweaksWindow:
                         widget.connect('font-set', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
+                    elif setting.type == 'file':
+                        widget = Gtk.FileChooserButton()
+                        setting.widget = widget
+                        widget.setting = setting
+                        temp = setting.get_value()
+                        if temp is None:
+                            temp = '~'
+                        widget.set_filename(temp)
+                        widget.connect('file-set', self.on_widget_changed)
+                        setting.connect(self.on_setting_change)
+                        enable = Gtk.Switch()
+                        if temp != '~':
+                            enable.set_active(True)
+                        enable.setting = setting
+                        enable.set_margin_bottom(5)
+                        enable.connect('notify::active', self.on_widget_changed)
+                        widget.null_switch = enable
+                        enable.target = widget
+                        switchbox = Gtk.Box()
+                        switchbox.add(enable)
+                        wbox.add(switchbox)
+                        wbox.add(widget)
                     elif setting.type == 'color':
                         widget = Gtk.ColorButton()
                         setting.widget = widget
@@ -250,6 +272,10 @@ class TweaksWindow:
                 i += 1
         elif setting.type == 'font':
             setting.widget.set_font(value)
+        elif setting.type == 'file':
+            if value is None:
+                value = '~'
+            setting.widget.set_filename(value)
         elif setting.type == 'number':
             if 'percentage' in setting.definition and setting.definition['percentage']:
                 val_range = setting.definition['max'] - setting.definition['min']
@@ -266,6 +292,19 @@ class TweaksWindow:
             setting.set_value(widget.get_active_text())
         elif setting.type == 'font':
             setting.set_value(widget.get_font())
+        elif setting.type == 'file':
+            if hasattr(widget, 'null_switch'):
+                # Filechooser changed
+                setting.set_value(widget.get_filename())
+                widget.null_switch.set_active(True)
+            else:
+                # Null switch changed
+                if widget.get_active():
+                    return
+                else:
+                    setting.set_value(None)
+                    widget.target.set_filename("~")
+
         elif setting.type == 'number':
             value = widget.get_value()
             if 'percentage' in setting.definition and setting.definition['percentage']:
@@ -274,7 +313,7 @@ class TweaksWindow:
             setting.set_value(value)
         elif setting.type == 'color':
             value = widget.get_color().to_string()
-            value = '#'+value[1:3]+value[5:7]+value[9:11]
+            value = '#' + value[1:3] + value[5:7] + value[9:11]
             setting.set_value(value)
 
     def on_select_page(self, widget, row):

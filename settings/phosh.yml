@@ -31,3 +31,32 @@
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.enable-animations
+
+- name: Appearance
+  weight: 30
+  sections:
+    - name: Phosh
+      weight: 10
+      settings:
+        - name: Lockscreen background
+          help: Background image for the Phosh lockscreen
+          type: file
+          backend: css
+          key: ~/.config/gtk-3.0/gtk.css
+          selector: phosh-lockscreen, .phosh-lockshield
+          guard: phosh-lockscreen-background
+          css:
+            background-image: "%"
+            background-size: cover
+            background-position: center
+        - name: Application list background
+          help: Background image for the Phosh lockscreen
+          type: file
+          backend: css
+          key: ~/.config/gtk-3.0/gtk.css
+          selector: phosh-app-grid
+          guard: phosh-applist-background
+          css:
+            background-image: "%"
+            background-size: cover
+            background-position: center
