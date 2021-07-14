@@ -9,3 +9,4 @@ GenericName=Tweaks
 Icon=org.postmarketos.Tweaks
 Categories=GTK;GNOME;Utility
 X-DBUS-ServiceName=org.postmarketos.Tweaks
+X-Purism-FormFactor=Workstation;Mobile;
