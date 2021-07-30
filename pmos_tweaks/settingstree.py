@@ -159,8 +159,8 @@ class Setting:
                             if line.strip().startswith(self.primary):
                                 key, val = line.strip().split(':', maxsplit=1)
                                 value = val.strip()[:-1]
-                                if value.startswith('url('):
-                                    value = value[11:-1]
+                                if value.startswith('url("'):
+                                    value = value[12:-2]
                         if line.startswith(self.guard_start):
                             in_block = True
                         elif line.startswith(self.guard_end):
@@ -230,7 +230,7 @@ class Setting:
             if value is None:
                 clear = True
             if value is not None and value.startswith('/'):
-                value = f'url(file://{value})'
+                value = f'url("file://{value}")'
             filename = os.path.expanduser(self.key)
             raw = []
             if os.path.isfile(filename):
