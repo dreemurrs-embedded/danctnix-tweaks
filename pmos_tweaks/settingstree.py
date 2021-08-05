@@ -254,7 +254,7 @@ class Setting:
                 if clear and line.strip() == self.guard_start:
                     ignore = True
                     continue
-                    
+
                 if not ignore:
                     result.append(line)
 
@@ -271,7 +271,7 @@ class Setting:
                     result.append('}\n')
 
             if not found and not clear:
-                if not result[-1].endswith('\n'):
+                if len(result) > 0 and not result[-1].endswith('\n'):
                     result.append('\n')
                 result.append(self.guard_start + '\n')
                 result.append(self.selector + ' {\n')
