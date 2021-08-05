@@ -148,6 +148,7 @@ class Setting:
                 value = self.hardware_info(self.key)
             elif self.backend == 'css':
                 filename = os.path.expanduser(self.key)
+                value = None
                 if os.path.isfile(filename):
                     with open(filename) as handle:
                         raw = handle.read()
