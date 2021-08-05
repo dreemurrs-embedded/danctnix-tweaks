@@ -271,6 +271,8 @@ class Setting:
                     result.append('}\n')
 
             if not found and not clear:
+                if not result[-1].endswith('\n'):
+                    result.append('\n')
                 result.append(self.guard_start + '\n')
                 result.append(self.selector + ' {\n')
                 for rule in self.rules:
