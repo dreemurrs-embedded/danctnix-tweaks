@@ -9,3 +9,4 @@ GenericName=Tweaks
 Icon=org.danctnix.Tweaks
 Categories=GTK;GNOME;Utility
 X-DBUS-ServiceName=org.danctnix.Tweaks
+X-Purism-FormFactor=Workstation;Mobile;

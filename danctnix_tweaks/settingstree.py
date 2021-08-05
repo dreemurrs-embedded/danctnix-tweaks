@@ -10,18 +10,14 @@ import danctnix_tweaks.socs as soc_data
 
 import yaml
 
-import gi
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk
-
 
 # Needed for qt5 theming, disabled because qt5 theming is a mess
 # from PyQt5 import QtWidgets
 
 
 class Setting:
-    def __init__(self, definition):
+    def __init__(self, definition, daemon=False):
+        self.daemon = daemon
         self.name = definition['name']
         self.weight = 50
         if 'weight' in definition:
@@ -43,7 +39,7 @@ class Setting:
         if self.data:
             self.create_map_from_data()
 
-        if self.backend == 'gsettings':
+        if self.backend == 'gsettings' and not self.daemon:
             self.gtype = definition['gtype'] if 'gtype' in definition else definition['type']
 
             if not isinstance(self.definition['key'], list):
@@ -52,6 +48,10 @@ class Setting:
                 part = key.split('.')
                 self.base_key = '.'.join(part[0:-1])
                 self.key = part[-1]
+                import gi
+
+                gi.require_version('Gtk', '3.0')
+                from gi.repository import Gio
 
                 source = Gio.SettingsSchemaSource.get_default()
                 if source.lookup(self.base_key, True) is None:
@@ -69,7 +69,9 @@ class Setting:
                 return
 
             self._settings.connect(f'changed::{self.key}', self._callback)
-
+        elif self.backend == 'gsettings':
+            self.valid = False
+            return
         elif self.backend == 'gtk3settings':
             self.key = definition['key']
             self.file = os.path.join(os.getenv('XDG_CONFIG_HOME', '~/.config'), 'gtk-3.0/settings.ini')
@@ -92,6 +94,16 @@ class Setting:
             self.default = definition['default']
         elif self.backend == 'hardwareinfo':
             self.key = definition['key']
+        elif self.backend == 'css':
+            self.key = definition['key']
+            self.selector = definition['selector']
+            self.rules = definition['css']
+            guard = definition['guard']
+            self.guard_start = f'/* TWEAKS-START {guard} */'
+            self.guard_end = f'/* TWEAKS-END {guard} */'
+            for rule in self.rules:
+                if self.rules[rule] == '%':
+                    self.primary = rule
 
     def connect(self, callback):
         self.callback = callback
@@ -101,44 +113,71 @@ class Setting:
             self.callback(self, self.get_value())
 
     def get_value(self):
-        if self.backend == 'gsettings':
-            if self.gtype == 'boolean':
-                value = self._settings.get_boolean(self.key)
-            elif self.gtype == 'string':
-                print(self.key)
-                value = self._settings.get_string(self.key)
-            elif self.gtype == 'number':
-                value = self._settings.get_int(self.key)
-            elif self.gtype == 'double':
-                value = self._settings.get_double(self.key)
-        elif self.backend == 'gtk3settings':
-            if os.path.isfile(self.file):
-                ini = configparser.ConfigParser()
-                ini.read(self.file)
-                value = ini.get('Settings', self.key)
-            else:
-                value = self.default
-        elif self.backend == 'environment':
-            value = os.getenv(self.key, default='')
-        elif self.backend == 'sysfs':
-            with open(self.key, 'r') as handle:
-                raw = handle.read()
-            if self.stype == 'int':
-                try:
-                    value = int(raw.rstrip('\0')) / self.multiplier
-                except ValueError:
-                    value = 0
-            self.value = value
-        elif self.backend == 'osksdl':
-            value = self.osksdl_read(self.key)
-        elif self.backend == 'hardwareinfo':
-            value = self.hardware_info(self.key)
+        try:
+            if self.backend == 'gsettings':
+                if self.gtype == 'boolean':
+                    value = self._settings.get_boolean(self.key)
+                elif self.gtype == 'string':
+                    print(self.key)
+                    value = self._settings.get_string(self.key)
+                elif self.gtype == 'number':
+                    value = self._settings.get_int(self.key)
+                elif self.gtype == 'double':
+                    value = self._settings.get_double(self.key)
+            elif self.backend == 'gtk3settings':
+                if os.path.isfile(self.file):
+                    ini = configparser.ConfigParser()
+                    ini.read(self.file)
+                    value = ini.get('Settings', self.key)
+                else:
+                    value = self.default
+            elif self.backend == 'environment':
+                value = os.getenv(self.key, default='')
+            elif self.backend == 'sysfs':
+                with open(self.key, 'r') as handle:
+                    raw = handle.read()
+                if self.stype == 'int':
+                    try:
+                        value = int(raw.rstrip('\0')) / self.multiplier
+                    except ValueError:
+                        value = 0
+                self.value = value
+            elif self.backend == 'osksdl':
+                value = self.osksdl_read(self.key)
+            elif self.backend == 'hardwareinfo':
+                value = self.hardware_info(self.key)
+            elif self.backend == 'css':
+                filename = os.path.expanduser(self.key)
+                value = None
+                if os.path.isfile(filename):
+                    with open(filename) as handle:
+                        raw = handle.read()
+                    if self.guard_start not in raw:
+                        value = None
+                    else:
+                        in_block = False
+                        for line in raw.splitlines():
+                            if in_block:
+                                if line.strip().startswith(self.primary):
+                                    key, val = line.strip().split(':', maxsplit=1)
+                                    value = val.strip()[:-1]
+                                    if value.startswith('url("'):
+                                        value = value[12:-2]
+                            if line.startswith(self.guard_start):
+                                in_block = True
+                            elif line.startswith(self.guard_end):
+                                in_block = False
+                else:
+                    value = None
 
-        if self.map:
-            for key in self.map:
-                if self.map[key] == value:
-                    value = key
-        return value
+            if self.map:
+                for key in self.map:
+                    if self.map[key] == value:
+                        value = key
+            return value
+        except Exception as e:
+            print(f"Exception while loading {self.name}/{self.type} backend {self.backend}")
+            raise e
 
     def set_value(self, value):
         if self.map:
@@ -191,8 +230,68 @@ class Setting:
                 value = int(value)
             self.value = value
 
+        elif self.backend == 'css':
+            clear = False
+            if value is None:
+                clear = True
+            if value is not None and value.startswith('/'):
+                value = f'url("file://{value}")'
+            filename = os.path.expanduser(self.key)
+            raw = []
+            if os.path.isfile(filename):
+                with open(filename) as handle:
+                    raw = list(handle.readlines())
+
+            result = []
+            found = False
+            ignore = False
+            for line in raw:
+                if line.strip() == self.guard_end:
+                    ignore = False
+                    if clear:
+                        continue
+
+                if clear and line.strip() == self.guard_start:
+                    ignore = True
+                    continue
+                    
+                if not ignore:
+                    result.append(line)
+
+                if line.strip() == self.guard_start:
+                    found = True
+                    ignore = True
+
+                    result.append(self.selector + ' {\n')
+                    for rule in self.rules:
+                        val = self.rules[rule]
+                        if val == '%':
+                            val = value
+                        result.append('\t' + rule + ': ' + val + ';\n')
+                    result.append('}\n')
+
+            if not found and not clear:
+                if not result[-1].endswith('\n'):
+                    result.append('\n')
+                result.append(self.guard_start + '\n')
+                result.append(self.selector + ' {\n')
+                for rule in self.rules:
+                    val = self.rules[rule]
+                    if val == '%':
+                        val = value
+                    result.append('\t' + rule + ': ' + val + ';\n')
+                result.append('}\n')
+                result.append(self.guard_end + '\n')
+
+            with open(filename, 'w') as handle:
+                handle.writelines(result)
+
     def create_map_from_data(self):
-        if self.data == 'gtk3themes':
+        if self.data == 'gtk3themes' and not self.daemon:
+            import gi
+
+            gi.require_version('Gtk', '3.0')
+            from gi.repository import Gtk
             gtk_ver = Gtk.MINOR_VERSION
             if gtk_ver % 2:
                 gtk_ver += 1
@@ -401,7 +500,8 @@ class Setting:
 
 
 class SettingsTree:
-    def __init__(self):
+    def __init__(self, daemon=False):
+        self.daemon = daemon
         self.settings = OrderedDict()
 
     def _sort_weight(self, unsorted):

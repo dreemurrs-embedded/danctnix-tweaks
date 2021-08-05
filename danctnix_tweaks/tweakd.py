@@ -7,7 +7,9 @@ from danctnix_tweaks.settingstree import SettingsTree
 
 def main(version, datadir=None):
     # Read settings yaml files to build a whitelist of settings that are allowed to change
-    st = SettingsTree()
+    # The daemon parameter makes it not load gtk components and skip gsettings things that won't
+    # work as root
+    st = SettingsTree(daemon=True)
     if datadir is not None:
         st.load_dir(os.path.join(datadir, 'danctnix-tweaks'))
     st.load_dir('/etc/danctnix-tweaks')
