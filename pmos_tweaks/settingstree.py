@@ -113,66 +113,70 @@ class Setting:
             self.callback(self, self.get_value())
 
     def get_value(self):
-        if self.backend == 'gsettings':
-            if self.gtype == 'boolean':
-                value = self._settings.get_boolean(self.key)
-            elif self.gtype == 'string':
-                print(self.key)
-                value = self._settings.get_string(self.key)
-            elif self.gtype == 'number':
-                value = self._settings.get_int(self.key)
-            elif self.gtype == 'double':
-                value = self._settings.get_double(self.key)
-        elif self.backend == 'gtk3settings':
-            if os.path.isfile(self.file):
-                ini = configparser.ConfigParser()
-                ini.read(self.file)
-                value = ini.get('Settings', self.key)
-            else:
-                value = self.default
-        elif self.backend == 'environment':
-            value = os.getenv(self.key, default='')
-        elif self.backend == 'sysfs':
-            with open(self.key, 'r') as handle:
-                raw = handle.read()
-            if self.stype == 'int':
-                try:
-                    value = int(raw.rstrip('\0')) / self.multiplier
-                except ValueError:
-                    value = 0
-            self.value = value
-        elif self.backend == 'osksdl':
-            value = self.osksdl_read(self.key)
-        elif self.backend == 'hardwareinfo':
-            value = self.hardware_info(self.key)
-        elif self.backend == 'css':
-            filename = os.path.expanduser(self.key)
-            if os.path.isfile(filename):
-                with open(filename) as handle:
-                    raw = handle.read()
-                if self.guard_start not in raw:
-                    value = None
+        try:
+            if self.backend == 'gsettings':
+                if self.gtype == 'boolean':
+                    value = self._settings.get_boolean(self.key)
+                elif self.gtype == 'string':
+                    print(self.key)
+                    value = self._settings.get_string(self.key)
+                elif self.gtype == 'number':
+                    value = self._settings.get_int(self.key)
+                elif self.gtype == 'double':
+                    value = self._settings.get_double(self.key)
+            elif self.backend == 'gtk3settings':
+                if os.path.isfile(self.file):
+                    ini = configparser.ConfigParser()
+                    ini.read(self.file)
+                    value = ini.get('Settings', self.key)
                 else:
-                    in_block = False
-                    for line in raw.splitlines():
-                        if in_block:
-                            if line.strip().startswith(self.primary):
-                                key, val = line.strip().split(':', maxsplit=1)
-                                value = val.strip()[:-1]
-                                if value.startswith('url("'):
-                                    value = value[12:-2]
-                        if line.startswith(self.guard_start):
-                            in_block = True
-                        elif line.startswith(self.guard_end):
-                            in_block = False
-            else:
-                value = None
+                    value = self.default
+            elif self.backend == 'environment':
+                value = os.getenv(self.key, default='')
+            elif self.backend == 'sysfs':
+                with open(self.key, 'r') as handle:
+                    raw = handle.read()
+                if self.stype == 'int':
+                    try:
+                        value = int(raw.rstrip('\0')) / self.multiplier
+                    except ValueError:
+                        value = 0
+                self.value = value
+            elif self.backend == 'osksdl':
+                value = self.osksdl_read(self.key)
+            elif self.backend == 'hardwareinfo':
+                value = self.hardware_info(self.key)
+            elif self.backend == 'css':
+                filename = os.path.expanduser(self.key)
+                if os.path.isfile(filename):
+                    with open(filename) as handle:
+                        raw = handle.read()
+                    if self.guard_start not in raw:
+                        value = None
+                    else:
+                        in_block = False
+                        for line in raw.splitlines():
+                            if in_block:
+                                if line.strip().startswith(self.primary):
+                                    key, val = line.strip().split(':', maxsplit=1)
+                                    value = val.strip()[:-1]
+                                    if value.startswith('url("'):
+                                        value = value[12:-2]
+                            if line.startswith(self.guard_start):
+                                in_block = True
+                            elif line.startswith(self.guard_end):
+                                in_block = False
+                else:
+                    value = None
 
-        if self.map:
-            for key in self.map:
-                if self.map[key] == value:
-                    value = key
-        return value
+            if self.map:
+                for key in self.map:
+                    if self.map[key] == value:
+                        value = key
+            return value
+        except Exception as e:
+            print(f"Exception while loading {self.name}/{self.type} backend {self.backend}")
+            raise e
 
     def set_value(self, value):
         if self.map:
