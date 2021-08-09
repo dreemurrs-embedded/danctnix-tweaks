@@ -81,7 +81,7 @@ class TweaksWindow:
         sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.sidebar.pack_start(sw, True, True, 0)
         self.listbox = Gtk.ListBox()
-        self.listbox.connect('row-selected', self.on_select_page)
+        self.listbox.connect('row-activated', self.on_select_page)
         sw.add(self.listbox)
 
         self.stack = Gtk.Stack()
@@ -117,6 +117,8 @@ class TweaksWindow:
             row.name = page
             row.title = page
             self.listbox.add(row)
+
+        self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
 
         for page in self.settings.settings:
             box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -317,6 +319,9 @@ class TweaksWindow:
             setting.set_value(value)
 
     def on_select_page(self, widget, row):
+        if self.listbox.get_selection_mode() == Gtk.SelectionMode.NONE:
+            self.listbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+            self.listbox.select_row(row)
         if row:
             self.stack.set_visible_child_name(row.name)
             self.headerbar.set_subtitle(row.title)
