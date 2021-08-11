@@ -334,6 +334,7 @@ class TweaksWindow:
 
     def on_back_clicked(self, widget, *args):
         self.leaflet.set_visible_child_name('sidebar')
+        self.headerbar.set_subtitle('')
 
     def on_leaflet_change(self, *args):
         folded = self.leaflet.get_folded()
