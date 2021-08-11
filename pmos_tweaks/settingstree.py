@@ -341,6 +341,27 @@ class Setting:
             self.map = {}
             for theme in result:
                 self.map[theme] = theme
+        elif self.data == 'soundthemes':
+            # TODO: Reduce code duplication
+            result = []
+            theme_dirs = glob.glob('/usr/share/sounds/*') + \
+                         glob.glob(os.path.expanduser('~/.local/share/sounds/*'))
+            for dir in theme_dirs:
+                if os.path.isfile(os.path.join(dir, 'index.theme')):
+                    result.append(dir)
+            self.map = {
+                'Custom Profile': '__custom'
+            }
+            for themedir in sorted(result):
+                theme = os.path.basename(themedir)
+                name = os.path.basename(themedir)
+                metafile = os.path.join(themedir, 'index.theme')
+                p = configparser.ConfigParser(strict=False)
+                p.read(metafile)
+                if p.has_section('Sound Theme'):
+                    name = p.get('Sound Theme', 'Name', fallback=name)
+                self.map[name] = theme
+
 
     def __getitem__(self, item):
         return getattr(self, item)

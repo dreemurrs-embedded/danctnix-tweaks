@@ -1,0 +1,14 @@
+- name: Sound
+  weight: 20
+  sections:
+    - name: Sound Settings
+      weight: 0
+      settings:
+        - name: Profile
+          type: choice
+          backend: gsettings
+          default: Default
+          help: The sound profile for feedback and notifications
+          gtype: string
+          key: org.gnome.desktop.sound.theme-name
+          data: soundthemes
