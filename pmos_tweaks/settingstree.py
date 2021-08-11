@@ -104,6 +104,30 @@ class Setting:
             for rule in self.rules:
                 if self.rules[rule] == '%':
                     self.primary = rule
+        elif self.backend in ['symlink', 'soundtheme']:
+            self.key = os.path.expanduser(definition['key'])
+            self.format = None
+            self.source_ext = definition['source_ext'] if 'source_ext' in definition else False
+
+            # Ensure the custom theme exists if this is for a sound theme
+            if self.backend == 'soundtheme':
+                self.source_ext = True
+                self.backend = 'symlink'
+                themedir = os.path.dirname(self.key)
+                themefile = os.path.join(themedir, 'index.theme')
+                if os.path.exists(themedir):
+                    if not os.path.isfile(themefile):
+                        self.valid = False
+                    return
+                else:
+                    os.makedirs(themedir)
+                    lines = []
+                    lines.append('[Sound Theme]\n')
+                    lines.append('Name=Custom Profile\n')
+                    lines.append('Inherits=freedesktop\n')
+                    lines.append('Directories=.\n')
+                    with open(themefile, 'w') as handle:
+                        handle.writelines(lines)
 
     def connect(self, callback):
         self.callback = callback
@@ -169,6 +193,22 @@ class Setting:
                                 in_block = False
                 else:
                     value = None
+            elif self.backend == 'symlink':
+                if self.format:
+                    link = self.key + '.' + self.format
+                    if os.path.islink(link):
+                        value = os.readlink(link)
+                    else:
+                        value = None
+                else:
+                    value = None
+                    if self.source_ext:
+                        for link in glob.iglob(self.key + '.*'):
+                            if os.path.islink(link):
+                                value = os.readlink(link)
+                                break
+                    else:
+                        value = os.readlink(self.key)
 
             if self.map:
                 for key in self.map:
@@ -285,6 +325,23 @@ class Setting:
 
             with open(filename, 'w') as handle:
                 handle.writelines(result)
+        elif self.backend == 'symlink':
+            if value is None:
+                if self.source_ext:
+                    link = self.key + '.' + self.format
+                else:
+                    link = self.key
+                if os.path.islink(link):
+                    os.unlink(link)
+                self.format = None
+            else:
+                target = os.path.expanduser(value)
+                if self.source_ext:
+                    self.format = target.split('.')[-1]
+                    link = self.key + '.' + self.format
+                else:
+                    link = self.key
+                os.symlink(target, link)
 
     def create_map_from_data(self):
         if self.data == 'gtk3themes' and not self.daemon:
@@ -361,7 +418,6 @@ class Setting:
                 if p.has_section('Sound Theme'):
                     name = p.get('Sound Theme', 'Name', fallback=name)
                 self.map[name] = theme
-
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -600,3 +656,4 @@ class SettingsTree:
                     result.set('osksdl', setting.key, str(setting.value))
 
         result.write(fp)
+
