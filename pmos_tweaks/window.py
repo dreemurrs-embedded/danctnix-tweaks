@@ -320,15 +320,14 @@ class TweaksWindow:
         if self.listbox.get_selection_mode() == Gtk.SelectionMode.NONE:
             self.listbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
             self.listbox.select_row(row)
-        if row:
-            self.stack.set_visible_child_name(row.name)
-            self.headerbar.set_subtitle(row.title)
-            self.leaflet.set_visible_child_name('content')
+        self.stack.set_visible_child_name(row.name)
+        self.headerbar.set_subtitle(row.title)
+        self.leaflet.set_visible_child_name('content')
 
-            # In folded view unselect the row in the listbox
-            # so it's possible to go back to the same page
-            if self.leaflet.get_folded():
-                self.listbox.unselect_row(row)
+        # In folded view unselect the row in the listbox
+        # so it's possible to go back to the same page
+        if self.leaflet.get_folded():
+            self.listbox.unselect_row(row)
 
     def on_main_window_destroy(self, widget):
         Gtk.main_quit()
