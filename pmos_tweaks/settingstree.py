@@ -167,7 +167,7 @@ class Setting:
                         value = 0
                 self.value = value
             elif self.backend == 'osksdl':
-                value = self.osksdl_read(self.key)
+                value = self.osksdl_read()
             elif self.backend == 'hardwareinfo':
                 value = self.hardware_info(self.key)
             elif self.backend == 'css':
@@ -422,14 +422,17 @@ class Setting:
     def __getitem__(self, item):
         return getattr(self, item)
 
-    def osksdl_read(self, key):
+    def osksdl_read(self):
         if not os.path.isfile('/boot/osk.conf'):
             return self.default
 
         with open('/boot/osk.conf') as handle:
             for line in handle.readlines():
                 if line.startswith(f"{self.key} = "):
-                    return line.split(' = ')[1].strip()
+                    value = line.split(' = ')[1].strip()
+                    if self.type == 'boolean':
+                        value = value == 'true'
+                    return value
         return self.default
 
     def get_file_contents(self, path):
