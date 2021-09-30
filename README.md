@@ -105,3 +105,32 @@ the setting and re-apply the setting after booting.
 The `stype` is the type of the variable that will be written, currently only `int` is supported. The multiplier is used
 to get the final integer value to write since floats are stored as integers with a multiplier in the kernel. The multiplier
 defaults to 1.
+
+### symlink
+
+```yaml
+backend: symlink
+key: ~/.local/var/example.data
+source_ext: false
+```
+
+This creates a symlink where the source is the input data from the user and the target is the `key`.
+
+If `source_ext` is true the extension of the source file will be appended to the key before using that as the target
+path for the symlink.
+
+Setting the value to `None` will remove the symlink.
+
+This backend is normally used with the file widget.
+
+### soundtheme
+
+```yaml
+backend: soundtheme
+key: ~/.local/share/sounds/__custom/phone-incoming-call
+```
+
+The soundtheme is the same as the `symlink` backend. The `source_ext` parameter is always true with this backend.
+
+It also ensures that the `index.theme` file exists in the same directory as the symlink to make it a valid custom sound
+theme.

@@ -1,0 +1,43 @@
+- name: Sound
+  weight: 20
+  sections:
+    - name: Sound Settings
+      weight: 0
+      settings:
+        - name: Profile
+          type: choice
+          backend: gsettings
+          default: Default
+          help: The sound profile for feedback and notifications
+          gtype: string
+          key: org.gnome.desktop.sound.theme-name
+          data: soundthemes
+    - name: Custom Profile
+      weight: 10
+      settings:
+        - name: Alarm Clock
+          help: Sound to play for alarm clock
+          type: file
+          backend: soundtheme
+          key: ~/.local/share/sounds/__custom/alarm-clock-elapsed
+        - name: Press Button
+          help: Sound to play when pressing a button
+          type: file
+          backend: soundtheme
+          key: ~/.local/share/sounds/__custom/button-pressed
+        - name: Incoming Call
+          help: Sound to play on incoming calls
+          type: file
+          backend: soundtheme
+          key: ~/.local/share/sounds/__custom/phone-incoming-call
+        - name: New SMS
+          help: Sound to play on incoming SMS
+          type: file
+          backend: soundtheme
+          key: ~/.local/share/sounds/__custom/message-new-instant
+        - name: New Email
+          help: Sound to play on incoming email
+          type: file
+          backend: soundtheme
+          key: ~/.local/share/sounds/__custom/message-new-email
+

@@ -29,8 +29,6 @@ class TweaksWindow:
         self.stack = None
         self.back = None
 
-        self.first_select = True
-
         self.create_window()
 
         self.settings = SettingsTree()
@@ -81,7 +79,7 @@ class TweaksWindow:
         sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.sidebar.pack_start(sw, True, True, 0)
         self.listbox = Gtk.ListBox()
-        self.listbox.connect('row-selected', self.on_select_page)
+        self.listbox.connect('row-activated', self.on_select_page)
         sw.add(self.listbox)
 
         self.stack = Gtk.Stack()
@@ -117,6 +115,8 @@ class TweaksWindow:
             row.name = page
             row.title = page
             self.listbox.add(row)
+
+        self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
 
         for page in self.settings.settings:
             box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -317,24 +317,24 @@ class TweaksWindow:
             setting.set_value(value)
 
     def on_select_page(self, widget, row):
-        if row:
-            self.stack.set_visible_child_name(row.name)
-            self.headerbar.set_subtitle(row.title)
-            if self.first_select:
-                self.first_select = False
-            else:
-                self.leaflet.set_visible_child_name('content')
+        if self.listbox.get_selection_mode() == Gtk.SelectionMode.NONE:
+            self.listbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+            self.listbox.select_row(row)
+        self.stack.set_visible_child_name(row.name)
+        self.headerbar.set_subtitle(row.title)
+        self.leaflet.set_visible_child_name('content')
 
-            # In folded view unselect the row in the listbox
-            # so it's possible to go back to the same page
-            if self.leaflet.get_folded():
-                self.listbox.unselect_row(row)
+        # In folded view unselect the row in the listbox
+        # so it's possible to go back to the same page
+        if self.leaflet.get_folded():
+            self.listbox.unselect_row(row)
 
     def on_main_window_destroy(self, widget):
         Gtk.main_quit()
 
     def on_back_clicked(self, widget, *args):
         self.leaflet.set_visible_child_name('sidebar')
+        self.headerbar.set_subtitle('')
 
     def on_leaflet_change(self, *args):
         folded = self.leaflet.get_folded()
