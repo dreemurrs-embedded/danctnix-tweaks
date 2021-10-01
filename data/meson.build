@@ -17,10 +17,6 @@ conf = configuration_data()
 conf.set('VERSION', meson.project_version())
 conf.set('bindir', get_option('bindir'))
 
-configure_file(
-    input: 'danctnix-tweakd.service.in',
-    output: 'danctnix-tweakd.service',
-    configuration: conf,
-    install: true,
-    install_dir: '/usr/lib/systemd/system'
-)
+
+install_data(['danctnix-tweakd.service'],
+    install_dir: '/usr/lib/systemd/system')
