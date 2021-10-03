@@ -407,7 +407,7 @@ class Setting:
                 if os.path.isfile(os.path.join(dir, 'index.theme')):
                     result.append(dir)
             self.map = {
-                'Custom Profile': '__custom'
+                'Custom': '__custom'
             }
             for themedir in sorted(result):
                 theme = os.path.basename(themedir)
@@ -659,4 +659,3 @@ class SettingsTree:
                     result.set('osksdl', setting.key, str(setting.value))
 
         result.write(fp)
-
