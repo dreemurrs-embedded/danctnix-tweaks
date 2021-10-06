@@ -16,6 +16,18 @@
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.clock-show-seconds
+        - name: Move clock
+          help: Make the clock off-center for phones with notches
+          type: boolean
+          backend: css
+          key: ~/.config/gtk-3.0/gtk.css
+          selector: .phosh-topbar-clock
+          guard: phosh-clock-notch
+          css:
+            margin-left: "%"
+          map:
+            true: "100px"
+            false: "0"
     - name: Battery
       weight: 10
       settings:
