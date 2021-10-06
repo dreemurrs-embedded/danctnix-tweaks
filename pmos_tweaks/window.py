@@ -254,7 +254,8 @@ class TweaksWindow:
                         widget = Gtk.SpinButton.new_with_range(w_min, w_max, w_step)
                         setting.widget = widget
                         widget.setting = setting
-                        widget.set_value(float(value))
+                        if value is not None:
+                            widget.set_value(float(value))
                         widget.connect('value-changed', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)

@@ -102,7 +102,7 @@ class Setting:
             self.guard_start = f'/* TWEAKS-START {guard} */'
             self.guard_end = f'/* TWEAKS-END {guard} */'
             for rule in self.rules:
-                if self.rules[rule] == '%':
+                if self.rules[rule].startswith('%'):
                     self.primary = rule
         elif self.backend in ['symlink', 'soundtheme']:
             self.key = os.path.expanduser(definition['key'])
@@ -185,7 +185,9 @@ class Setting:
                                 if line.strip().startswith(self.primary):
                                     key, val = line.strip().split(':', maxsplit=1)
                                     value = val.strip()[:-1]
-                                    if value.startswith('url("'):
+                                    if self.definition['css'][key] == '%px':
+                                        value = float(value[:-2])
+                                    elif value.startswith('url("'):
                                         value = value[12:-2]
                             if line.startswith(self.guard_start):
                                 in_block = True
@@ -274,7 +276,7 @@ class Setting:
             clear = False
             if value is None:
                 clear = True
-            if value is not None and value.startswith('/'):
+            if value is not None and isinstance(value, str) and value.startswith('/'):
                 value = f'url("file://{value}")'
             filename = os.path.expanduser(self.key)
             raw = []
@@ -307,6 +309,8 @@ class Setting:
                         val = self.rules[rule]
                         if val == '%':
                             val = value
+                        elif val == '%px':
+                            val = f'{value}px'
                         result.append('\t' + rule + ': ' + val + ';\n')
                     result.append('}\n')
 
@@ -319,6 +323,8 @@ class Setting:
                     val = self.rules[rule]
                     if val == '%':
                         val = value
+                    elif val == '%px':
+                        val = f'{value}px'
                     result.append('\t' + rule + ': ' + val + ';\n')
                 result.append('}\n')
                 result.append(self.guard_end + '\n')
