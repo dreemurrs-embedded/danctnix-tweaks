@@ -93,6 +93,8 @@ arm_part = {
         517: "Kryo",
         529: "Kryo",
         2048: "Falkor V1/Kryo",
+        2050: "Kryo 3xx gold",
+        2051: "Kryo 3xx silver",
         2049: "Kryo V2",
         3072: "Falkor",
         3073: "Saphira",
