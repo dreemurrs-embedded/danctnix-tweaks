@@ -21,7 +21,7 @@ def main(version, datadir=None):
         for section in settings[page]['sections']:
             for setting in settings[page]['sections'][section]['settings']:
                 s = settings[page]['sections'][section]['settings'][setting]
-                if s.backend == 'sysfs':
+                if s.backend == 'sysfs' and not s.readonly:
                     whitelist_sysfs.append(s.key)
 
     # Read the stored settings and apply them

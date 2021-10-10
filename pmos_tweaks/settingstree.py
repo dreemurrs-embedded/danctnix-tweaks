@@ -88,6 +88,7 @@ class Setting:
             self.key = definition['key']
             self.stype = definition['stype']
             self.multiplier = definition['multiplier'] if 'multiplier' in definition else 1
+            self.readonly = definition['readonly'] if 'readonly' in definition else False
         elif self.backend == 'osksdl':
             self.needs_root = True
             self.key = definition['key']
