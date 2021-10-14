@@ -488,6 +488,7 @@ class SymlinkBackend(Backend):
             if self.source_ext:
                 for link in glob.iglob(self.key + '.*'):
                     if os.path.islink(link):
+                        self.format = link.split('.')[-1]
                         return os.readlink(link)
             else:
                 return os.readlink(self.key)
