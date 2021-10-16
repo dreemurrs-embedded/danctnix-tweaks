@@ -27,3 +27,4 @@
           stype: int
           backend: sysfs
           key: /sys/firmware/devicetree/base/memory/ram_freq
+          readonly: true

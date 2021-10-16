@@ -31,6 +31,34 @@
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.enable-animations
+    - name: Display notch tweaks
+      weight: 30
+      settings:
+        - name: Move clock
+          help: Make the clock off-center for phones with notches
+          type: number
+          backend: css
+          key: ~/.config/gtk-3.0/gtk.css
+          selector: .phosh-topbar-clock
+          guard: phosh-clock-notch
+          min: 0
+          max: 300
+          step: 10
+          css:
+            margin-left: "%px"
+        - name: Vertical spacing
+          help: Extra space to the left and right of the indicators to work around rounded corners
+          type: number
+          backend: css
+          key: ~/.config/gtk-3.0/gtk.css
+          selector: .phosh-panel-btn
+          guard: phosh-panel-btn-space
+          min: 0
+          max: 60
+          step: 1
+          css:
+            margin-left: "%px"
+            margin-right: "%px"
 
 - name: Appearance
   weight: 30
