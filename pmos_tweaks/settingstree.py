@@ -549,7 +549,7 @@ class Setting:
                     else:
                         cpus[model] = 1
                 buffer = {}
-            if line.startswith('model name'):
+            if line.startswith('model name') and 'ARMv' not in line:
                 _, val = line.split(':')
                 name = val.strip()
                 if name in cpus:
