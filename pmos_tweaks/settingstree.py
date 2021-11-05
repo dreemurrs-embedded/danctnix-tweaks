@@ -571,7 +571,10 @@ class Setting:
         if os.path.isdir('/sys/devices/soc0'):
             machine = self.get_file_contents('/sys/devices/soc0/machine')
             family = self.get_file_contents('/sys/devices/soc0/family')
-            if machine is not None:
+            soc_id = self.get_file_contents('/sys/devices/soc0/soc_id')
+            if soc_id is not None and 'EXYNOS' in soc_id:
+                return f"Exynos {soc_id[6:]}"
+            elif machine is not None:
                 if family is None:
                     return machine
                 else:
