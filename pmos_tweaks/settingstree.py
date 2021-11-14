@@ -39,7 +39,7 @@ class Setting:
         self.callback = None
         self.widget = None
         self.valid = self.backend.is_valid()
-        self.needs_root = False
+        self.needs_root = self.backend.NEED_ROOT
         self.value = None
 
         self.map = definition['map'] if 'map' in definition else None
@@ -160,14 +160,11 @@ class SettingsTree:
 
         result = configparser.ConfigParser()
         for setting in needs_saving:
-            if setting.backend == 'sysfs':
-                if not result.has_section('sysfs'):
-                    result.add_section('sysfs')
-                result.set('sysfs', setting.key, str(int(setting.value * setting.multiplier)))
-            if setting.backend == 'osksdl':
-                if not result.has_section('osksdl'):
-                    result.add_section('osksdl')
-                if setting.value is not None:
-                    result.set('osksdl', setting.key, str(setting.value))
-
+            store = setting.backend.get_tweakd_setting()
+            if store is None:
+                continue
+            ini_section, ini_key, ini_value = store
+            if not result.has_section(ini_section):
+                result.add_section(ini_section)
+            result.set(ini_section, ini_key, ini_value)
         result.write(fp)

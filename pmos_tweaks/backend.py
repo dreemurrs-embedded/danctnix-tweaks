@@ -41,6 +41,9 @@ class Backend:
         except:
             return None
 
+    def get_tweakd_setting(self):
+        return None
+
 
 class GsettingsBackend(Backend):
     NOT_IN_DAEMON = True
@@ -170,14 +173,22 @@ class SysfsBackend(Backend):
             raw = handle.read()
         if self.stype == 'int':
             try:
-                return int(raw.rstrip('\0')) / self.multiplier
+                self.value = int(raw.rstrip('\0')) / self.multiplier
             except ValueError:
-                return 0
+                self.value = 0
+        return self.value
 
     def set_value(self, value):
         """ Value is not set here, it's done by the background service """
         if self.stype == 'int':
             self.value = value
+
+    def get_tweakd_setting(self):
+        if self.value is None:
+            return None
+        if self.readonly:
+            return None
+        return 'sysfs', self.key, str(int(self.value * self.multiplier))
 
 
 class OsksdlBackend(Backend):
@@ -189,6 +200,7 @@ class OsksdlBackend(Backend):
 
     def get_value(self):
         if not os.path.isfile('/boot/osk.conf'):
+            self.value = self.default
             return self.default
 
         with open('/boot/osk.conf') as handle:
@@ -197,7 +209,9 @@ class OsksdlBackend(Backend):
                     value = line.split(' = ')[1].strip()
                     if self.type == 'boolean':
                         value = value == 'true'
+                    self.value = value
                     return value
+        self.value = self.default
         return self.default
 
     def set_value(self, value):
@@ -205,6 +219,11 @@ class OsksdlBackend(Backend):
         if isinstance(value, float):
             value = int(value)
         self.value = value
+
+    def get_tweakd_setting(self):
+        if self.value is None:
+            return None
+        return 'osksdl', self.key, str(self.value)
 
 
 class HardwareinfoBackend(Backend):
