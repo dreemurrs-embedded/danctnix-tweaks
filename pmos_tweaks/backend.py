@@ -23,6 +23,9 @@ class Backend:
     def is_valid(self):
         return True
 
+    def needs_root(self):
+        return self.definition['needs-root'] if 'needs-root' in self.definition else self.NEED_ROOT
+
     def get_value(self):
         raise NotImplemented()
 
@@ -528,3 +531,40 @@ class SoundthemeBackend(SymlinkBackend):
             lines.append('Directories=.\n')
             with open(themefile, 'w') as handle:
                 handle.writelines(lines)
+
+
+class FileBackend(Backend):
+    def __init__(self, definition):
+        super().__init__(definition)
+
+        self.default = definition['default'] if 'default' in definition else None
+        self.root = definition['needs-root'] if 'needs-root' in definition else False
+
+    def is_valid(self):
+        if self.definition is None:
+            return os.path.isfile(self.key)
+        else:
+            return True
+
+    def get_value(self):
+        self.value = None
+        if os.path.isfile(self.key):
+            with open(self.key, 'r') as handle:
+                self.value = handle.read()
+        return self.value
+
+    def set_value(self, value):
+        """ Value is not set here if the setting is in a root-only location, the tweakd part will handle it """
+        self.value = value
+
+        if not self.root:
+            with open(self.key, 'w') as handle:
+                handle.write(self.value)
+
+    def get_tweakd_setting(self):
+        if not self.root:
+            return None
+
+        if self.value is None:
+            return None
+        return 'file', self.key, str(self.value)

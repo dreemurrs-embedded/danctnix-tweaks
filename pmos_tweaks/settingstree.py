@@ -39,7 +39,7 @@ class Setting:
         self.callback = None
         self.widget = None
         self.valid = self.backend.is_valid()
-        self.needs_root = self.backend.NEED_ROOT
+        self.needs_root = self.backend.needs_root()
         self.value = None
 
         self.map = definition['map'] if 'map' in definition else None

@@ -16,6 +16,7 @@ def main(version, datadir=None):
     settings = st.settings
 
     whitelist_sysfs = []
+    whitelist_file = []
 
     for page in settings:
         for section in settings[page]['sections']:
@@ -24,6 +25,8 @@ def main(version, datadir=None):
                 readonly = s.definition['readonly'] if 'readonly' in s.definition else False
                 if s.backend_name == 'sysfs' and not readonly:
                     whitelist_sysfs.append(s.key)
+                elif s.backend_name == 'file' and not readonly:
+                    whitelist_file.append(s.key)
 
     # Read the stored settings and apply them
     config = configparser.ConfigParser()
@@ -35,6 +38,16 @@ def main(version, datadir=None):
             if path not in whitelist_sysfs:
                 print(f"Skipping {path}, not defined in setting definitions")
             value = config.get('sysfs', path)
+            print(f"{path} = {value}")
+            with open(path, 'w') as handle:
+                handle.write(value)
+
+    # Apply file settings
+    if config.has_section('file'):
+        for path in config.options('file'):
+            if path not in whitelist_file:
+                print(f"Skipping {path}, not defined in setting definitions")
+            value = config.get('file', path)
             print(f"{path} = {value}")
             with open(path, 'w') as handle:
                 handle.write(value)
