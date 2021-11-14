@@ -33,6 +33,8 @@ sources = [
     'window.py',
     'settingstree.py',
     'tweakd.py',
+    'backend.py',
+    'datasource.py',
     'cpus.py',
     'socs.py',
 ]
