@@ -54,6 +54,7 @@ class GsettingsBackend(Backend):
     def __init__(self, definition):
         super().__init__(definition)
         self.gtype = definition['gtype'] if 'gtype' in definition else definition['type']
+        self.valid = True
         if not isinstance(self.definition['key'], list):
             self.definition['key'] = [self.definition['key']]
         for key in self.definition['key']:
@@ -78,10 +79,10 @@ class GsettingsBackend(Backend):
             for key in self.definition['key']:
                 print(f" - {key}")
             self.valid = False
-            return
 
     def register_callback(self, callback):
-        self._settings.connect(f'changed::{self.key}', callback)
+        if self.valid:
+            self._settings.connect(f'changed::{self.key}', callback)
 
     def get_value(self):
         if self.gtype == 'boolean':
@@ -110,6 +111,9 @@ class GsettingsBackend(Backend):
             self._settings.set_double(self.key, value)
         elif self.gtype == 'flags':
             self._settings.set_flags(self.key, value)
+
+    def is_valid(self):
+        return self.valid
 
 
 class Gtk3SettingsBackend(Backend):
