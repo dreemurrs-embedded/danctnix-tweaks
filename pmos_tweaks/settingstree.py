@@ -136,7 +136,7 @@ class SettingsTree:
                     for setting in section['settings']:
 
                         if setting['name'] not in self.settings[page['name']]['sections'][section['name']]['settings']:
-                            setting_obj = Setting(setting)
+                            setting_obj = Setting(setting, daemon=self.daemon)
                             if not setting_obj.valid:
                                 continue
                             self.settings[page['name']]['sections'][section['name']]['settings'][
