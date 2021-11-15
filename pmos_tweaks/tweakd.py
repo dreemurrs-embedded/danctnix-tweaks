@@ -17,6 +17,7 @@ def main(version, datadir=None):
 
     whitelist_sysfs = []
     whitelist_file = []
+    file_newlines = {}
 
     for page in settings:
         for section in settings[page]['sections']:
@@ -27,6 +28,7 @@ def main(version, datadir=None):
                     whitelist_sysfs.append(s.key)
                 elif s.backend_name == 'file' and not readonly:
                     whitelist_file.append(s.key)
+                    file_newlines[s.key] = s.definition.newline
 
     # Read the stored settings and apply them
     config = configparser.ConfigParser()
@@ -37,6 +39,7 @@ def main(version, datadir=None):
         for path in config.options('sysfs'):
             if path not in whitelist_sysfs:
                 print(f"Skipping {path}, not defined in setting definitions")
+                continue
             value = config.get('sysfs', path)
             print(f"{path} = {value}")
             with open(path, 'w') as handle:
@@ -47,10 +50,14 @@ def main(version, datadir=None):
         for path in config.options('file'):
             if path not in whitelist_file:
                 print(f"Skipping {path}, not defined in setting definitions")
+                continue
             value = config.get('file', path)
             print(f"{path} = {value}")
             with open(path, 'w') as handle:
-                handle.write(value)
+                if file_newlines[path]:
+                    handle.write(value + '\n')
+                else:
+                    handle.write(value)
 
     # Apply osk-sdl settings
     if config.has_section('osksdl'):

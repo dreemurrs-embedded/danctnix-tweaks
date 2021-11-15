@@ -548,6 +548,7 @@ class FileBackend(Backend):
 
         self.default = definition['default'] if 'default' in definition else None
         self.root = definition['needs-root'] if 'needs-root' in definition else False
+        self.newline = definition['trailing-newline'] if 'trailing-newline' in definition else True
 
     def is_valid(self):
         if self.definition is None:
@@ -558,8 +559,12 @@ class FileBackend(Backend):
     def get_value(self):
         self.value = None
         if os.path.isfile(self.key):
-            with open(self.key, 'r') as handle:
-                self.value = handle.read()
+            with open(os.path.expanduser(self.key), 'r') as handle:
+                val = handle.read()
+                if self.newline:
+                    self.value = val.rstrip('\n')
+                else:
+                    self.value = val
         return self.value
 
     def set_value(self, value):
@@ -567,8 +572,11 @@ class FileBackend(Backend):
         self.value = value
 
         if not self.root:
-            with open(self.key, 'w') as handle:
-                handle.write(self.value)
+            with open(os.path.expanduser(self.key), 'w') as handle:
+                val = self.value
+                if self.newline:
+                    val += '\n'
+                handle.write(val)
 
     def get_tweakd_setting(self):
         if not self.root:
