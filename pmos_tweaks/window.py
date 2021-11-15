@@ -130,6 +130,13 @@ class TweaksWindow:
             self.stack.add_named(sw, page)
 
             for section in self.settings.settings[page]['sections']:
+                has_settings = False
+                for name in self.settings.settings[page]['sections'][section]['settings']:
+                    setting = self.settings.settings[page]['sections'][section]['settings'][name]
+                    if setting.valid:
+                        has_settings = True
+                if not has_settings:
+                    continue
                 label = Gtk.Label(label=section, xalign=0.0)
                 label.get_style_context().add_class('heading')
                 label.set_margin_bottom(4)
