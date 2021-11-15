@@ -31,6 +31,18 @@
           type: boolean
           backend: gsettings
           key: org.gnome.desktop.interface.enable-animations
+    - name: Homescreen
+      weight: 25
+      settings:
+        - name: Application filter
+          help: Enable the button to filter out non-adaptive apps in the application list
+          type: boolean
+          backend: gsettings
+          gtype: flags
+          key: sm.puri.phosh.app-filter-mode
+          map:
+            true: 1
+            false: 0
     - name: Display notch tweaks
       weight: 30
       settings:

@@ -92,6 +92,8 @@ class GsettingsBackend(Backend):
             value = self._settings.get_int(self.key)
         elif self.gtype == 'double':
             value = self._settings.get_double(self.key)
+        elif self.gtype == 'flags':
+            value = self._settings.get_flags(self.key)
         else:
             raise ValueError("Unknown type for gsettings backend")
         print(self.key, value)
@@ -106,6 +108,8 @@ class GsettingsBackend(Backend):
             self._settings.set_int(self.key, value)
         elif self.gtype == 'double':
             self._settings.set_double(self.key, value)
+        elif self.gtype == 'flags':
+            self._settings.set_flags(self.key, value)
 
 
 class Gtk3SettingsBackend(Backend):
