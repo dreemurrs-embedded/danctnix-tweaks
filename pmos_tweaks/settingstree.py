@@ -8,6 +8,11 @@ import pmos_tweaks.datasource as datasources
 
 import yaml
 
+try:
+    from yaml import CSafeLoader as SafeLoader
+except ImportError:
+    from yaml import SafeLoader
+
 
 # Needed for qt5 theming, disabled because qt5 theming is a mess
 # from PyQt5 import QtWidgets
@@ -107,7 +112,7 @@ class SettingsTree:
             with open(file) as handle:
                 raw = handle.read()
 
-            data = yaml.load(raw, Loader=yaml.SafeLoader)
+            data = yaml.load(raw, Loader=SafeLoader)
 
             for page in data:
                 if page['name'] not in self.settings:
