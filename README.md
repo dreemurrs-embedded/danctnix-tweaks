@@ -134,3 +134,20 @@ The soundtheme is the same as the `symlink` backend. The `source_ext` parameter 
 
 It also ensures that the `index.theme` file exists in the same directory as the symlink to make it a valid custom sound
 theme.
+
+### file
+
+```yaml
+backend: file
+key: ~/.config/example-file
+needs-root: false
+trailing-newline: true
+```
+
+The file backend is for writing plain text to a file without any parsing. The `key` is the filename to write.
+
+The `needs-root` argument signifies that the file needs root permissions to write to. This will defer the writing to
+tweakd. Expanduser is not used in this case since tweakd runs as root.
+
+The `trailing-newline` setting defaults to true, if this is set a newline will be added at the end of the file and
+removed again on reading.
