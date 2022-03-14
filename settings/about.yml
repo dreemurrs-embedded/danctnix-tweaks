@@ -52,3 +52,17 @@
           type: info
           backend: hardwareinfo
           key: distro
+        - name: Firmware vendor
+          weight: 40
+          type: info
+          backend: sysfs
+          stype: string
+          key: /sys/class/dmi/id/bios_vendor
+          readonly: true
+        - name: Firmware version
+          weight: 50
+          type: info
+          backend: sysfs
+          stype: string
+          key: /sys/class/dmi/id/bios_version
+          readonly: true
