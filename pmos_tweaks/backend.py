@@ -177,7 +177,12 @@ class SysfsBackend(Backend):
         self.readonly = definition['readonly'] if 'readonly' in definition else False
 
     def is_valid(self):
-        return os.path.isfile(self.definition['key'])
+        if not os.path.isfile(self.definition['key']):
+            return False
+
+        if os.path.getsize(self.definition['key']) == 0:
+            return False
+        return True
 
     def get_value(self):
         with open(self.key, 'r') as handle:
