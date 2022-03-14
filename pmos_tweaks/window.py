@@ -141,12 +141,11 @@ class TweaksWindow:
                 label.get_style_context().add_class('heading')
                 label.set_margin_bottom(4)
                 box.pack_start(label, False, True, 0)
-                frame = Gtk.Frame()
-                frame.get_style_context().add_class('view')
+                frame = Gtk.ListBox()
+                frame.set_selection_mode(Gtk.SelectionMode.NONE)
+                frame.get_style_context().add_class('content')
                 frame.set_margin_bottom(12)
                 box.pack_start(frame, False, True, 0)
-                fbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                frame.add(fbox)
 
                 for name in self.settings.settings[page]['sections'][section]['settings']:
                     setting = self.settings.settings[page]['sections'][section]['settings'][name]
@@ -157,7 +156,7 @@ class TweaksWindow:
                     sbox.set_margin_right(8)
                     lbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
                     sbox.pack_start(lbox, True, True, 0)
-                    fbox.pack_start(sbox, False, True, 0)
+                    frame.add(sbox)
                     wbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
                     sbox.pack_end(wbox, False, False, 0)
 
@@ -166,7 +165,7 @@ class TweaksWindow:
 
                     if setting.help:
                         hlabel = Gtk.Label(label=setting.help, xalign=0.0)
-                        hlabel.get_style_context().add_class('dim-label')
+                        hlabel.get_style_context().add_class('subtitle')
                         hlabel.set_line_wrap(True)
                         lbox.pack_start(hlabel, False, True, 0)
 
