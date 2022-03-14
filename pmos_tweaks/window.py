@@ -139,7 +139,8 @@ class TweaksWindow:
                     continue
                 label = Gtk.Label(label=section, xalign=0.0)
                 label.get_style_context().add_class('heading')
-                label.set_margin_bottom(4)
+                label.set_margin_bottom(8)
+                label.set_margin_top(16)
                 box.pack_start(label, False, True, 0)
                 frame = Gtk.ListBox()
                 frame.set_selection_mode(Gtk.SelectionMode.NONE)
