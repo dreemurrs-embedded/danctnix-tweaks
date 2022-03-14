@@ -187,6 +187,10 @@ class SysfsBackend(Backend):
                 self.value = int(raw.rstrip('\0')) / self.multiplier
             except ValueError:
                 self.value = 0
+        elif self.stype == 'string':
+            self.value = raw.rstrip('\0').strip()
+        else:
+            print(f"Unknown sysfs stype: {self.stype}")
         return self.value
 
     def set_value(self, value):
