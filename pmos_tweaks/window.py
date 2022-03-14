@@ -388,6 +388,10 @@ class TweaksWindow:
     def on_leaflet_change(self, *args):
         self.titleleaflet.set_visible_child_name(self.leaflet.get_visible_child_name())
         self.back.set_visible(self.leaflet.get_folded())
+        if self.leaflet.get_folded():
+            self.headerbar_side.set_title("postmarketOS Tweaks")
+        else:
+            self.headerbar_side.set_title("")
 
     def on_save_settings(self, *args):
         fd, filename = tempfile.mkstemp()
