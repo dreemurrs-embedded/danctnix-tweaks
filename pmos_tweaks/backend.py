@@ -247,13 +247,13 @@ class HardwareinfoBackend(Backend):
         GB = 1024 * 1024 * 1024
 
         if key == 'model':
+            if os.path.isdir('/proc/device-tree'):
+                return self.get_file_contents('/proc/device-tree/model')
             dmidir = '/sys/devices/virtual/dmi/id'
             if os.path.isdir(dmidir):
                 manufacturer = self.get_file_contents(os.path.join(dmidir, 'chassis_vendor')) or ''
                 model = self.get_file_contents(os.path.join(dmidir, 'product_name')) or ''
                 return '{} {}'.format(manufacturer, model).strip()
-            if os.path.isdir('/proc/device-tree'):
-                return self.get_file_contents('/proc/device-tree/model')
         elif key == 'memory':
             memdir = '/sys/devices/system/memory'
             if os.path.isdir(memdir):
