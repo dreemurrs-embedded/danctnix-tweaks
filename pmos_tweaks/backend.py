@@ -496,19 +496,19 @@ class SymlinkBackend(Backend):
 
     def get_value(self):
         if self.format:
-            link = self.key + '.' + self.format
+            link = os.path.expanduser(self.key + '.' + self.format)
             if os.path.islink(link):
                 return os.readlink(link)
             else:
                 return None
         else:
             if self.source_ext:
-                for link in glob.iglob(self.key + '.*'):
+                for link in glob.iglob(os.path.expanduser(self.key) + '.*'):
                     if os.path.islink(link):
                         self.format = link.split('.')[-1]
                         return os.readlink(link)
             else:
-                return os.readlink(self.key)
+                return os.readlink(os.path.expanduser(self.key))
 
     def set_value(self, value):
         if value is None:
@@ -516,6 +516,7 @@ class SymlinkBackend(Backend):
                 link = self.key + '.' + self.format
             else:
                 link = self.key
+            link = os.path.expanduser(link)
             if os.path.islink(link):
                 os.unlink(link)
             self.format = None
@@ -526,7 +527,7 @@ class SymlinkBackend(Backend):
                 link = self.key + '.' + self.format
             else:
                 link = self.key
-            os.symlink(target, link)
+            os.symlink(target, os.path.expanduser(link))
 
 
 class SoundthemeBackend(SymlinkBackend):
