@@ -22,6 +22,15 @@
     </screenshots>
     <content_rating type="oars-1.1"/>
     <releases>
+        <release version="0.11.0" date="2022-03-24">
+            <description>
+                <ul>
+                    <li>Fix custom audio profile generation</li>
+                    <li>Update styling for a more modern look</li>
+                </ul>
+            </description>
+        </release>
+
         <release version="0.10.0" date="2022-03-14">
             <description>
                 <ul>
