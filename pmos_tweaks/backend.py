@@ -610,7 +610,7 @@ class XresourcesBackend(Backend):
 
         with open(self.xres) as handle:
             for line in handle.readlines():
-                if line.startswith(f"{self.key}"):
+                if line.startswith(f"{self.key}:"):
                     value = line.split(': ')[1].strip()
                     self.value = value
                     return value

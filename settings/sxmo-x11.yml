@@ -1,7 +1,7 @@
-- name: SXMO
-  weight: 30
+- name: Sxmo
+  weight: 11
   sections:
-    - name: DWM
+    - name: Dwm
       weight: 10
       settings:
         - name: Status bar Color
