@@ -1,0 +1,177 @@
+- name: SXMO
+  weight: 30
+  sections:
+    - name: DWM
+      weight: 10
+      settings:
+        - name: Status bar Color
+          type: color
+          backend: xresources
+          key: dwm.background
+          default: "#222222"
+        - name: Status bar text color
+          type: color
+          backend: xresources
+          key: dwm.foreground
+          default: "#BBBBBB"
+        - name: Window border color
+          type: color
+          backend: xresources
+          key: dwm.border
+          default: "#444444"
+        - name: Selected tag color
+          type: color
+          backend: xresources
+          key: dwm.selbackground
+          default: "#005577"
+        - name: Selected tag text color
+          type: color
+          backend: xresources
+          key: dwm.selforeground
+          default: "#EEEEEE"
+        - name: Selected window border color
+          type: color
+          backend: xresources
+          key: dwm.selborder
+          default: "#005577"
+    - name: dmenu
+      weight: 10
+      settings:
+        - name: Background color
+          type: color
+          backend: xresources
+          key: dmenu.background
+          default: "#222222"
+        - name: Text color
+          type: color
+          backend: xresources
+          key: dmenu.foreground
+          default: "#BBBBBB"
+        - name: Selected item color
+          type: color
+          backend: xresources
+          key: dmenu.selbackground
+          default: "#005577"
+        - name: Selected item text color
+          type: color
+          backend: xresources
+          key: dmenu.selforeground
+          default: "#EEEEEE"
+        - name: Highlighted item color
+          type: color
+          backend: xresources
+          key: dmenu.outbackground
+          default: "#00ffff"
+        - name: Highlited item text color
+          type: color
+          backend: xresources
+          key: dmenu.outforeground
+          default: "#000000"
+    - name: svkbd
+      weight: 10
+      settings:
+        - name: Outer key color
+          type: color
+          backend: xresources
+          key: svkbd.background
+          default: "#132A33"
+        - name: Outer key text color
+          type: color
+          backend: xresources
+          key: svkbd.foreground
+          default: "#BBBBBB"
+        - name: Outer key shift color
+          type: color
+          backend: xresources
+          key: svkbd.shiftbackground
+          default: "#132A33"
+        - name: Outer key shift text color
+          type: color
+          backend: xresources
+          key: svkbd.shiftforeground
+          default: "#008ac0"
+        - name: Inner key color
+          type: color
+          backend: xresources
+          key: svkbd.ABCbackground
+          default: "#14313d"
+        - name: Inner key text color
+          type: color
+          backend: xresources
+          key: svkbd.ABCforeground
+          default: "#FFFFFF"
+        - name: Inner key shift color
+          type: color
+          backend: xresources
+          key: svkbd.ABCshiftbackground
+          default: "#14313d"
+        - name: Inner key shift text color
+          type: color
+          backend: xresources
+          key: svkbd.ABCshiftforeground
+          default: "#008AC0"
+        - name: Pressed key color
+          type: color
+          backend: xresources
+          key: svkbd.pressbackground
+          default: "#259937"
+        - name: Pressed key text color
+          type: color
+          backend: xresources
+          key: svkbd.pressforeground
+          default: "#FFFFFF"
+        - name: Pressed key shift color
+          type: color
+          backend: xresources
+          key: svkbd.pressshiftbackground
+          default: "#259937"
+        - name: Pressed key shift text color
+          type: color
+          backend: xresources
+          key: svkbd.pressshiftforeground
+          default: "#00C001"
+        - name: Highlighted key color
+          type: color
+          backend: xresources
+          key: svkbd.highlightbackground
+          default: "#005577"
+        - name: Highlighted key text color
+          type: color
+          backend: xresources
+          key: svkbd.highlightforeground
+          default: "#058A7C"
+        - name: Highlighted key shift color
+          type: color
+          backend: xresources
+          key: svkbd.highlightshiftbackground
+          default: "#005577"
+        - name: Highlighted key shift text color
+          type: color
+          backend: xresources
+          key: svkbd.highlightshiftforeground
+          default: "#008AC0"
+        - name: Alternate key color
+          type: color
+          backend: xresources
+          key: svkbd.overlaybackground
+          default: "#2B3313"
+        - name: Alternate key text color
+          type: color
+          backend: xresources
+          key: svkbd.overlayforeground
+          default: "#FFFFFF"
+        - name: Alternate key shift color
+          type: color
+          backend: xresources
+          key: svkbd.overlayshiftbackground
+          default: "#2B3313"
+        - name: Alternate key shift text color
+          type: color
+          backend: xresources
+          key: svkbd.overlayshiftforeground
+          default: "#008AC0"
+        - name: Color of window between keys
+          type: color
+          backend: xresources
+          key: svkbd.windowbackground
+          default: "#132A33"
