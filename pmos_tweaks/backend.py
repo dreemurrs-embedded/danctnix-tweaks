@@ -7,7 +7,6 @@ import subprocess
 import pmos_tweaks.cpus as cpu_data
 import pmos_tweaks.socs as soc_data
 
-
 class Backend:
     NEED_ROOT = False
     NEED_REBOOT = False
@@ -595,3 +594,41 @@ class FileBackend(Backend):
         if self.value is None:
             return None
         return 'file', self.key, str(self.value)
+
+class XresourcesBackend(Backend):
+    def __init__(self, definition):
+        super().__init__(definition)
+
+        self.xres = os.path.expanduser('~/.Xresources')
+        self.default = definition['default'] if 'default' in definition else None
+
+    def get_value(self):
+
+        if not os.path.isfile(self.xres):
+            self.value = self.default
+            return self.default
+
+        with open(self.xres) as handle:
+            for line in handle.readlines():
+                if line.startswith(f"{self.key}"):
+                    value = line.split(': ')[1].strip()
+                    self.value = value
+                    return value
+        self.value = self.default
+        return self.default
+
+    def set_value(self, value):
+        lines = []
+        if os.path.isfile(self.xres):
+            with open(self.xres) as handle:
+                lines = list(handle.readlines())
+
+        for i, line in enumerate(lines):
+            if line.startswith(f'{self.key}: '):
+                lines[i] = f'{self.key}: {value}\n'
+                break
+        else:
+            lines.append(f'{self.key}: {value}\n')
+
+        with open(self.xres, 'w') as handle:
+            handle.writelines(lines)
