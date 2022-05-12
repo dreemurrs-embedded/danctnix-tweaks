@@ -21,13 +21,20 @@ class TweaksWindow:
         Handy.init()
 
         self.window = None
+        self.titlebar = None
+        self.titleleaflet = None
+        self.headerbar_side = None
         self.headerbar = None
+        self.headergroup = None
         self.leaflet = None
         self.sidebar = None
         self.content = None
         self.listbox = None
         self.stack = None
         self.back = None
+
+        self.sg_sidebar = None
+        self.sg_main = None
 
         self.create_window()
 
@@ -43,6 +50,13 @@ class TweaksWindow:
         Gtk.main()
 
     def create_window(self):
+        self.sg_sidebar = Gtk.SizeGroup()
+        self.sg_sidebar.set_mode(Gtk.SizeGroupMode.HORIZONTAL)
+        self.sg_main = Gtk.SizeGroup()
+        self.sg_main.set_mode(Gtk.SizeGroupMode.HORIZONTAL)
+
+        self.headergroup = Handy.HeaderGroup()
+
         self.window = Handy.Window()
         self.window.set_default_size(640, 480)
         self.window.set_title('DanctNIX Tweaks')
@@ -51,9 +65,27 @@ class TweaksWindow:
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.window.add(box)
 
+        self.titlebar = Gtk.Box()
+        self.titleleaflet = Handy.Leaflet()
+        self.titlebar.add(self.titleleaflet)
+
+        self.headerbar_side = Handy.HeaderBar()
+        self.headerbar_side.set_show_close_button(True)
+        self.titleleaflet.add(self.headerbar_side)
+        self.titleleaflet.child_set(self.headerbar_side, name="sidebar")
+        leaflet_sep = Gtk.Separator()
+        leaflet_sep.get_style_context().add_class('sidebar')
+        self.titleleaflet.add(leaflet_sep)
+
         self.headerbar = Handy.HeaderBar()
+        self.titleleaflet.add(self.headerbar)
+        self.titleleaflet.child_set(self.headerbar, name="content")
         self.headerbar.set_title("DanctNIX Tweaks")
         self.headerbar.set_show_close_button(True)
+        self.headerbar.set_hexpand(True)
+
+        self.headergroup.add_header_bar(self.headerbar_side)
+        self.headergroup.add_header_bar(self.headerbar)
 
         self.back = Gtk.Button.new_from_icon_name("go-previous-symbolic", 1)
         self.back.connect("clicked", self.on_back_clicked)
@@ -71,9 +103,18 @@ class TweaksWindow:
         self.content.props.hexpand = True
         self.leaflet.add(self.sidebar)
         self.leaflet.child_set(self.sidebar, name="sidebar")
+        leaflet_sep = Gtk.Separator()
+        leaflet_sep.get_style_context().add_class('sidebar')
+        self.leaflet.add(leaflet_sep)
         self.leaflet.add(self.content)
         self.leaflet.child_set(self.content, name="content")
         self.leaflet.set_visible_child_name("sidebar")
+
+        self.sg_sidebar.add_widget(self.headerbar_side)
+        self.sg_sidebar.add_widget(self.sidebar)
+
+        self.sg_main.add_widget(self.headerbar)
+        self.sg_main.add_widget(self.content)
 
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -85,7 +126,7 @@ class TweaksWindow:
         self.stack = Gtk.Stack()
         self.content.pack_start(self.stack, True, True, 0)
 
-        box.pack_start(self.headerbar, False, True, 0)
+        box.pack_start(self.titlebar, False, True, 0)
         box.pack_start(self.leaflet, True, True, 0)
 
         self.actionbar = Gtk.ActionBar()
@@ -139,14 +180,14 @@ class TweaksWindow:
                     continue
                 label = Gtk.Label(label=section, xalign=0.0)
                 label.get_style_context().add_class('heading')
-                label.set_margin_bottom(4)
+                label.set_margin_bottom(8)
+                label.set_margin_top(16)
                 box.pack_start(label, False, True, 0)
-                frame = Gtk.Frame()
-                frame.get_style_context().add_class('view')
+                frame = Gtk.ListBox()
+                frame.set_selection_mode(Gtk.SelectionMode.NONE)
+                frame.get_style_context().add_class('content')
                 frame.set_margin_bottom(12)
                 box.pack_start(frame, False, True, 0)
-                fbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                frame.add(fbox)
 
                 for name in self.settings.settings[page]['sections'][section]['settings']:
                     setting = self.settings.settings[page]['sections'][section]['settings'][name]
@@ -157,7 +198,7 @@ class TweaksWindow:
                     sbox.set_margin_right(8)
                     lbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
                     sbox.pack_start(lbox, True, True, 0)
-                    fbox.pack_start(sbox, False, True, 0)
+                    frame.add(sbox)
                     wbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
                     sbox.pack_end(wbox, False, False, 0)
 
@@ -166,7 +207,7 @@ class TweaksWindow:
 
                     if setting.help:
                         hlabel = Gtk.Label(label=setting.help, xalign=0.0)
-                        hlabel.get_style_context().add_class('dim-label')
+                        hlabel.get_style_context().add_class('subtitle')
                         hlabel.set_line_wrap(True)
                         lbox.pack_start(hlabel, False, True, 0)
 
@@ -345,9 +386,12 @@ class TweaksWindow:
         self.headerbar.set_subtitle('')
 
     def on_leaflet_change(self, *args):
-        folded = self.leaflet.get_folded()
-        content = self.leaflet.get_visible_child_name() == "content"
-        self.back.set_visible(folded and content)
+        self.titleleaflet.set_visible_child_name(self.leaflet.get_visible_child_name())
+        self.back.set_visible(self.leaflet.get_folded())
+        if self.leaflet.get_folded():
+            self.headerbar_side.set_title("DanctNIX Tweaks")
+        else:
+            self.headerbar_side.set_title("")
 
     def on_save_settings(self, *args):
         fd, filename = tempfile.mkstemp()

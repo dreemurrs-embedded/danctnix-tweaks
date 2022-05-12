@@ -2,7 +2,7 @@ install_data('org.danctnix.Tweaks.desktop',
     install_dir: join_paths(get_option('datadir'), 'applications'),
 )
 
-install_data(['org.danctnix.Tweaks.appdata.xml'],
+install_data(['org.danctnix.Tweaks.metainfo.xml'],
              install_dir : get_option('datadir') / 'metainfo')
 
 install_data('org.danctnix.Tweaks.svg',

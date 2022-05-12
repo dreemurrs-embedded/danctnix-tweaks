@@ -7,7 +7,6 @@ import subprocess
 import danctnix_tweaks.cpus as cpu_data
 import danctnix_tweaks.socs as soc_data
 
-
 class Backend:
     NEED_ROOT = False
     NEED_REBOOT = False
@@ -177,7 +176,12 @@ class SysfsBackend(Backend):
         self.readonly = definition['readonly'] if 'readonly' in definition else False
 
     def is_valid(self):
-        return os.path.isfile(self.definition['key'])
+        if not os.path.isfile(self.definition['key']):
+            return False
+
+        if os.path.getsize(self.definition['key']) == 0:
+            return False
+        return True
 
     def get_value(self):
         with open(self.key, 'r') as handle:
@@ -187,6 +191,10 @@ class SysfsBackend(Backend):
                 self.value = int(raw.rstrip('\0')) / self.multiplier
             except ValueError:
                 self.value = 0
+        elif self.stype == 'string':
+            self.value = raw.rstrip('\0').strip()
+        else:
+            print(f"Unknown sysfs stype: {self.stype}")
         return self.value
 
     def set_value(self, value):
@@ -243,13 +251,13 @@ class HardwareinfoBackend(Backend):
         GB = 1024 * 1024 * 1024
 
         if key == 'model':
+            if os.path.isdir('/proc/device-tree'):
+                return self.get_file_contents('/proc/device-tree/model')
             dmidir = '/sys/devices/virtual/dmi/id'
             if os.path.isdir(dmidir):
                 manufacturer = self.get_file_contents(os.path.join(dmidir, 'chassis_vendor')) or ''
                 model = self.get_file_contents(os.path.join(dmidir, 'product_name')) or ''
                 return '{} {}'.format(manufacturer, model).strip()
-            if os.path.isdir('/proc/device-tree'):
-                return self.get_file_contents('/proc/device-tree/model')
         elif key == 'memory':
             memdir = '/sys/devices/system/memory'
             if os.path.isdir(memdir):
@@ -487,19 +495,19 @@ class SymlinkBackend(Backend):
 
     def get_value(self):
         if self.format:
-            link = self.key + '.' + self.format
+            link = os.path.expanduser(self.key + '.' + self.format)
             if os.path.islink(link):
                 return os.readlink(link)
             else:
                 return None
         else:
             if self.source_ext:
-                for link in glob.iglob(self.key + '.*'):
+                for link in glob.iglob(os.path.expanduser(self.key) + '.*'):
                     if os.path.islink(link):
                         self.format = link.split('.')[-1]
                         return os.readlink(link)
             else:
-                return os.readlink(self.key)
+                return os.readlink(os.path.expanduser(self.key))
 
     def set_value(self, value):
         if value is None:
@@ -507,6 +515,7 @@ class SymlinkBackend(Backend):
                 link = self.key + '.' + self.format
             else:
                 link = self.key
+            link = os.path.expanduser(link)
             if os.path.islink(link):
                 os.unlink(link)
             self.format = None
@@ -517,7 +526,7 @@ class SymlinkBackend(Backend):
                 link = self.key + '.' + self.format
             else:
                 link = self.key
-            os.symlink(target, link)
+            os.symlink(target, os.path.expanduser(link))
 
 
 class SoundthemeBackend(SymlinkBackend):
@@ -585,3 +594,41 @@ class FileBackend(Backend):
         if self.value is None:
             return None
         return 'file', self.key, str(self.value)
+
+class XresourcesBackend(Backend):
+    def __init__(self, definition):
+        super().__init__(definition)
+
+        self.xres = os.path.expanduser('~/.Xresources')
+        self.default = definition['default'] if 'default' in definition else None
+
+    def get_value(self):
+
+        if not os.path.isfile(self.xres):
+            self.value = self.default
+            return self.default
+
+        with open(self.xres) as handle:
+            for line in handle.readlines():
+                if line.startswith(f"{self.key}:"):
+                    value = line.split(': ')[1].strip()
+                    self.value = value
+                    return value
+        self.value = self.default
+        return self.default
+
+    def set_value(self, value):
+        lines = []
+        if os.path.isfile(self.xres):
+            with open(self.xres) as handle:
+                lines = list(handle.readlines())
+
+        for i, line in enumerate(lines):
+            if line.startswith(f'{self.key}: '):
+                lines[i] = f'{self.key}: {value}\n'
+                break
+        else:
+            lines.append(f'{self.key}: {value}\n')
+
+        with open(self.xres, 'w') as handle:
+            handle.writelines(lines)

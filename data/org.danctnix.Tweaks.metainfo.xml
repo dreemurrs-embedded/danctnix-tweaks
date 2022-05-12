@@ -22,6 +22,45 @@
     </screenshots>
     <content_rating type="oars-1.1"/>
     <releases>
+        <release version="0.12.0" date="2022-05-12">
+            <description>
+                <ul>
+                    <li>Add support for configuring Sxmo colors</li>
+                </ul>
+            </description>
+    	</release>
+    
+        <release version="0.11.0" date="2022-03-24">
+            <description>
+                <ul>
+                    <li>Fix custom audio profile generation</li>
+                    <li>Update styling for a more modern look</li>
+                </ul>
+            </description>
+        </release>
+
+        <release version="0.10.0" date="2022-03-14">
+            <description>
+                <ul>
+                    <li>Add DMI firmware info on the About page</li>
+                    <li>Prefer DTB device model over the DMI model</li>
+                    <li>Hide the memory speed on the PinePhone if the data is invalid</li>
+                </ul>
+            </description>
+        </release>
+
+        <release version="0.9.0" date="2021-11-23">
+            <description>
+                <ul>
+                    <li>Better CPU information for 32 bit ARM</li>
+                    <li>Complete refactor of the backends</li>
+                    <li>Added a Phosh setting for the adaptive app filter</li>
+                    <li>Hide sections without any valid settings in them</li>
+                    <li>Fix icon in Gnome/Phosh</li>
+                </ul>
+            </description>
+        </release>
+
         <release version="0.8.0" date="2021-09-29">
             <description>
                 <ul>
