@@ -22,6 +22,14 @@
     </screenshots>
     <content_rating type="oars-1.1"/>
     <releases>
+        <release version="0.12.0" date="2022-05-12">
+            <description>
+                <ul>
+                    <li>Add support for configuring Sxmo colors</li>
+                </ul>
+            </description>
+    	</release>
+    
         <release version="0.11.0" date="2022-03-24">
             <description>
                 <ul>
