@@ -31,7 +31,7 @@ class Gtk3ThemesDatasource(Datasource):
                 result.append(os.path.basename(dir))
             elif os.path.isdir(os.path.join(dir, f'gtk-{gtk_ver}')):
                 result.append(os.path.basename(dir))
-        result_map = {}
+        result_map = {'Adwaita': 'Adwaita', 'High Contrast': 'HighContrast'}
         for theme in sorted(result):
             name = theme
             metafile = os.path.join('/usr/share/themes', theme, 'index.theme')
