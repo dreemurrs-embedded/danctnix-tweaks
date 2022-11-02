@@ -23,6 +23,12 @@ class TweaksApplication(Gtk.Application):
     def do_activate(self, *args):
         TweaksWindow(self, self.datadir)
 
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+
+        Handy.StyleManager.get_default().set_color_scheme(
+            Handy.ColorScheme.PREFER_LIGHT)
+
 
 def main(version, datadir=None):
     app = TweaksApplication("org.postmarketos.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
