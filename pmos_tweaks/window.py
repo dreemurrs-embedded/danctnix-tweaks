@@ -14,11 +14,10 @@ gi.require_version('Handy', '1')
 from gi.repository import Handy
 
 
-class TweaksWindow:
+class TweaksWindow(Handy.ApplicationWindow):
     def __init__(self, application, datadir):
-        self.application = application
+        super().__init__(application=application, title='postmarketOS Tweaks')
 
-        self.window = None
         self.titlebar = None
         self.titleleaflet = None
         self.headerbar_side = None
@@ -34,7 +33,8 @@ class TweaksWindow:
         self.sg_sidebar = None
         self.sg_main = None
 
-        self.create_window()
+        self.set_default_size(640, 480)
+        self.init_window()
 
         self.settings = SettingsTree()
         if datadir:
@@ -44,10 +44,9 @@ class TweaksWindow:
         self.settings.load_dir('../settings')
 
         self.create_pages()
-        self.window.show_all()
-        Gtk.main()
+        self.show_all()
 
-    def create_window(self):
+    def init_window(self):
         self.sg_sidebar = Gtk.SizeGroup()
         self.sg_sidebar.set_mode(Gtk.SizeGroupMode.HORIZONTAL)
         self.sg_main = Gtk.SizeGroup()
@@ -55,13 +54,8 @@ class TweaksWindow:
 
         self.headergroup = Handy.HeaderGroup()
 
-        self.window = Handy.Window()
-        self.window.set_default_size(640, 480)
-        self.window.set_title('postmarketOS Tweaks')
-        self.window.connect('destroy', self.on_main_window_destroy)
-
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.window.add(box)
+        self.add(box)
 
         self.titlebar = Gtk.Box()
         self.titleleaflet = Handy.Leaflet()
@@ -375,9 +369,6 @@ class TweaksWindow:
         # so it's possible to go back to the same page
         if self.leaflet.get_folded():
             self.listbox.unselect_row(row)
-
-    def on_main_window_destroy(self, widget):
-        Gtk.main_quit()
 
     def on_back_clicked(self, widget, *args):
         self.leaflet.set_visible_child_name('sidebar')

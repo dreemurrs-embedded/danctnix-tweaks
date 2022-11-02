@@ -17,11 +17,14 @@ Handy.init()
 class TweaksApplication(Gtk.Application):
     def __init__(self, application_id, flags, datadir):
         self.datadir = datadir
+        self.window = None
         Gtk.Application.__init__(self, application_id=application_id, flags=flags)
         GLib.set_prgname(application_id)
 
     def do_activate(self, *args):
-        TweaksWindow(self, self.datadir)
+        if not self.window:
+            self.window = TweaksWindow(self, self.datadir)
+        self.window.present()
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
