@@ -16,9 +16,8 @@ class TweaksApplication(Gtk.Application):
         self.datadir = datadir
         Gtk.Application.__init__(self, application_id=application_id, flags=flags)
         GLib.set_prgname(application_id)
-        self.connect("activate", self.new_window)
 
-    def new_window(self, *args):
+    def do_activate(self, *args):
         TweaksWindow(self, self.datadir)
 
 
