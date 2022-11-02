@@ -11,6 +11,9 @@ gi.require_version('Handy', '1')
 from gi.repository import Handy
 
 
+Handy.init()
+
+
 class TweaksApplication(Gtk.Application):
     def __init__(self, application_id, flags, datadir):
         self.datadir = datadir
@@ -22,7 +25,6 @@ class TweaksApplication(Gtk.Application):
 
 
 def main(version, datadir=None):
-    Handy.init()
     app = TweaksApplication("org.postmarketos.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
     app.run()
 

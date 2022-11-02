@@ -18,8 +18,6 @@ class TweaksWindow:
     def __init__(self, application, datadir):
         self.application = application
 
-        Handy.init()
-
         self.window = None
         self.titlebar = None
         self.titleleaflet = None
