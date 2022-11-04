@@ -4,9 +4,20 @@
     - name: GTK
       weight: 0
       settings:
+        - name: Style
+          type: choice
+          gtype: string
+          help: Prefer dark or light for Adwaita applications
+          backend: gsettings
+          key: org.gnome.desktop.interface.color-scheme
+          default: "default"
+          map:
+            Default: default
+            Light: prefer-light
+            Dark: prefer-dark
         - name: Legacy prefer dark
           type: boolean
-          help: Use dark version of the theme. Only some GTK3 applications will react to this setting. See Appearance panel in main Settings application for the rest.
+          help: Use dark version of the theme. Only some GTK3 applications will react to this setting.
           backend: gtk3settings
           key: gtk-application-prefer-dark-theme
           default: "0"
