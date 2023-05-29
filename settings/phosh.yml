@@ -47,7 +47,7 @@
       weight: 27
       settings:
         - name: Shuffle keypad
-          help: wether to shuffle the numbers on the keypad
+          help: Whether to shuffle the numbers on the keypad
           type: boolean
           backend: gsettings
           key: sm.puri.phosh.lockscreen.shuffle-keypad
