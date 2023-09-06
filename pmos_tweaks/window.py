@@ -124,7 +124,8 @@ class TweaksWindow(Handy.ApplicationWindow):
         self.action_revealer = Gtk.Revealer()
         box.pack_start(self.action_revealer, False, True, 0)
         self.action_revealer.add(self.actionbar)
-        label = Gtk.Label(label="You have changed settings that need root permissions to save.", xalign=0.0)
+        label = Gtk.Label(label="You have changed settings that need root"
+                          " permissions to save.", xalign=0.0)
         label.set_line_wrap(True)
         self.actionbar.pack_start(label)
         self.action_button = Gtk.Button.new_with_label("Apply")
@@ -187,11 +188,13 @@ class TweaksWindow(Handy.ApplicationWindow):
                         # This throws if the backend encounters an error
                         value = setting.get_value()
                     except Exception:
-                        error_label = Gtk.Label(label="{}: exception occurred loading this setting".format(name), xalign = 0.0)
+                        error_label = Gtk.Label(label="{name}: exception occurred loading this"
+                                                " setting", xalign = 0.0)
                         import traceback
                         tb = traceback.format_exc()
                         copy_details_button = Gtk.Button(label="Copy exception trace")
-                        copy_details_button.connect('clicked', lambda self: Gtk.Clipboard.get_default(self.get_display()).set_text(tb, -1))
+                        copy_details_button.connect('clicked', lambda self: \
+                                Gtk.Clipboard.get_default(self.get_display()).set_text(tb, -1))
                         info_bar = Gtk.InfoBar()
                         info_bar.set_message_type(Gtk.MessageType.ERROR)
                         info_bar.get_content_area().add(error_label)
@@ -297,7 +300,8 @@ class TweaksWindow(Handy.ApplicationWindow):
                             w_max = 100
                             w_step = 1
                             val_range = setting.definition['max'] - setting.definition['min']
-                            value_to_display = int((value - setting.definition['min']) / val_range * 100)
+                            value_to_display = int((value - setting.definition['min']) \
+                                                   / val_range * 100)
 
                         else:
                             w_min = setting.definition['min']

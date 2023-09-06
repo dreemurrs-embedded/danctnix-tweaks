@@ -268,7 +268,8 @@ class HardwareinfoBackend(Backend):
                 blocksize_byes = int(blocksize, 16)
                 memory_bytes = blocks * blocksize_byes
             else:
-                meminfo = dict((i.split()[0].rstrip(':'), int(i.split()[1])) for i in open('/proc/meminfo').readlines())
+                meminfo = dict((i.split()[0].rstrip(':'), int(i.split()[1])) \
+                        for i in open('/proc/meminfo').readlines())
                 mem_kib = meminfo['MemTotal']
                 memory_bytes = mem_kib * 1024
             if memory_bytes > GB:
@@ -577,7 +578,8 @@ class FileBackend(Backend):
         return self.value
 
     def set_value(self, value):
-        """ Value is not set here if the setting is in a root-only location, the tweakd part will handle it """
+        """ Value is not set here if the setting is in a root-only location,
+            the tweakd part will handle it """
         self.value = value
 
         if not self.root:
