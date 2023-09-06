@@ -185,20 +185,20 @@ class TweaksWindow(Handy.ApplicationWindow):
                     setting = self.settings.settings[page]['sections'][section]['settings'][name]
 
                     try:
-                      # This throws if the backend encounters an error
-                      value = setting.get_value()
+                        # This throws if the backend encounters an error
+                        value = setting.get_value()
                     except Exception as e:
-                      error_label = Gtk.Label(label="{}: exception occurred loading this setting".format(name), xalign = 0.0)
-                      import traceback
-                      tb = traceback.format_exc()
-                      copy_details_button = Gtk.Button(label="Copy exception trace")
-                      copy_details_button.connect('clicked', lambda self: Gtk.Clipboard.get_default(self.get_display()).set_text(tb, -1))
-                      info_bar = Gtk.InfoBar()
-                      info_bar.set_message_type(Gtk.MessageType.ERROR)
-                      info_bar.get_content_area().add(error_label)
-                      info_bar.add_action_widget(copy_details_button, 0)
-                      frame.add(info_bar)
-                      continue
+                        error_label = Gtk.Label(label="{}: exception occurred loading this setting".format(name), xalign = 0.0)
+                        import traceback
+                        tb = traceback.format_exc()
+                        copy_details_button = Gtk.Button(label="Copy exception trace")
+                        copy_details_button.connect('clicked', lambda self: Gtk.Clipboard.get_default(self.get_display()).set_text(tb, -1))
+                        info_bar = Gtk.InfoBar()
+                        info_bar.set_message_type(Gtk.MessageType.ERROR)
+                        info_bar.get_content_area().add(error_label)
+                        info_bar.add_action_widget(copy_details_button, 0)
+                        frame.add(info_bar)
+                        continue
 
                     sbox = Gtk.Box()
                     sbox.set_margin_top(8)
