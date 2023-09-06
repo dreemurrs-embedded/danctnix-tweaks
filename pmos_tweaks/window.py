@@ -186,7 +186,7 @@ class TweaksWindow(Handy.ApplicationWindow):
                     try:
                         # This throws if the backend encounters an error
                         value = setting.get_value()
-                    except Exception as e:
+                    except Exception:
                         error_label = Gtk.Label(label="{}: exception occurred loading this setting".format(name), xalign = 0.0)
                         import traceback
                         tb = traceback.format_exc()
