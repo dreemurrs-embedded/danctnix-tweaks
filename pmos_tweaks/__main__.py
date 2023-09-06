@@ -1,5 +1,3 @@
-import argparse
-import os
 import gi
 
 from pmos_tweaks.window import TweaksWindow

@@ -1,14 +1,13 @@
 import os
 import subprocess
 import tempfile
-import time
 
 import gi
 
 from pmos_tweaks.settingstree import SettingsTree
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib, GObject, Gio, Gdk, GLib, Pango
+from gi.repository import Gtk, Gdk, Pango
 
 gi.require_version('Handy', '1')
 from gi.repository import Handy
