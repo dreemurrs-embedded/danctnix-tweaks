@@ -26,10 +26,10 @@ class Backend:
         return self.definition['needs-root'] if 'needs-root' in self.definition else self.NEED_ROOT
 
     def get_value(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def set_value(self, value):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def register_callback(self, callback):
         return
