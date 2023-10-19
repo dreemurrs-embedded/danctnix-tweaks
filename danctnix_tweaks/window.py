@@ -14,13 +14,10 @@ gi.require_version('Handy', '1')
 from gi.repository import Handy
 
 
-class TweaksWindow:
+class TweaksWindow(Handy.ApplicationWindow):
     def __init__(self, application, datadir):
-        self.application = application
+        super().__init__(application=application, title='DanctNIX Tweaks')
 
-        Handy.init()
-
-        self.window = None
         self.titlebar = None
         self.titleleaflet = None
         self.headerbar_side = None
@@ -36,7 +33,8 @@ class TweaksWindow:
         self.sg_sidebar = None
         self.sg_main = None
 
-        self.create_window()
+        self.set_default_size(640, 480)
+        self.init_window()
 
         self.settings = SettingsTree()
         if datadir:
@@ -46,10 +44,9 @@ class TweaksWindow:
         self.settings.load_dir('../settings')
 
         self.create_pages()
-        self.window.show_all()
-        Gtk.main()
+        self.show_all()
 
-    def create_window(self):
+    def init_window(self):
         self.sg_sidebar = Gtk.SizeGroup()
         self.sg_sidebar.set_mode(Gtk.SizeGroupMode.HORIZONTAL)
         self.sg_main = Gtk.SizeGroup()
@@ -57,13 +54,8 @@ class TweaksWindow:
 
         self.headergroup = Handy.HeaderGroup()
 
-        self.window = Handy.Window()
-        self.window.set_default_size(640, 480)
-        self.window.set_title('DanctNIX Tweaks')
-        self.window.connect('destroy', self.on_main_window_destroy)
-
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.window.add(box)
+        self.add(box)
 
         self.titlebar = Gtk.Box()
         self.titleleaflet = Handy.Leaflet()
@@ -191,6 +183,23 @@ class TweaksWindow:
 
                 for name in self.settings.settings[page]['sections'][section]['settings']:
                     setting = self.settings.settings[page]['sections'][section]['settings'][name]
+
+                    try:
+                      # This throws if the backend encounters an error
+                      value = setting.get_value()
+                    except Exception as e:
+                      error_label = Gtk.Label(label="{}: exception occurred loading this setting".format(name), xalign = 0.0)
+                      import traceback
+                      tb = traceback.format_exc()
+                      copy_details_button = Gtk.Button(label="Copy exception trace")
+                      copy_details_button.connect('clicked', lambda self: Gtk.Clipboard.get_default(self.get_display()).set_text(tb, -1))
+                      info_bar = Gtk.InfoBar()
+                      info_bar.set_message_type(Gtk.MessageType.ERROR)
+                      info_bar.get_content_area().add(error_label)
+                      info_bar.add_action_widget(copy_details_button, 0)
+                      frame.add(info_bar)
+                      continue
+
                     sbox = Gtk.Box()
                     sbox.set_margin_top(8)
                     sbox.set_margin_bottom(8)
@@ -213,7 +222,7 @@ class TweaksWindow:
 
                     if setting.type == 'boolean':
                         widget = Gtk.Switch()
-                        widget.set_active(setting.get_value())
+                        widget.set_active(value)
 
                         # Make sure I leak some memory
                         setting.widget = widget
@@ -224,7 +233,7 @@ class TweaksWindow:
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
                     elif setting.type == 'info':
-                        widget = Gtk.Label(label=setting.get_value())
+                        widget = Gtk.Label(label=value)
                         widget.set_xalign(0.0)
                         widget.get_style_context().add_class('dim-label')
                         widget.set_ellipsize(Pango.EllipsizeMode.MIDDLE)
@@ -235,11 +244,10 @@ class TweaksWindow:
                         widget.setting = setting
 
                         widget.set_entry_text_column(0)
-                        val = setting.get_value()
                         i = 0
                         for key in setting.map:
                             widget.append_text(key)
-                            if key == val:
+                            if key == value:
                                 widget.set_active(i)
                             i += 1
                         widget.connect('changed', self.on_widget_changed)
@@ -249,7 +257,7 @@ class TweaksWindow:
                         widget = Gtk.FontButton()
                         setting.widget = widget
                         widget.setting = setting
-                        widget.set_font(setting.get_value())
+                        widget.set_font(value)
                         widget.connect('font-set', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
@@ -257,14 +265,12 @@ class TweaksWindow:
                         widget = Gtk.FileChooserButton()
                         setting.widget = widget
                         widget.setting = setting
-                        temp = setting.get_value()
-                        if temp is None:
-                            temp = '~'
-                        widget.set_filename(temp)
+                        filename_to_display = value or '~'
+                        widget.set_filename(filename_to_display)
                         widget.connect('file-set', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         enable = Gtk.Switch()
-                        if temp != '~':
+                        if filename_to_display != '~':
                             enable.set_active(True)
                         enable.setting = setting
                         enable.set_margin_bottom(5)
@@ -279,7 +285,6 @@ class TweaksWindow:
                         widget = Gtk.ColorButton()
                         setting.widget = widget
                         widget.setting = setting
-                        value = setting.get_value()
                         if value.startswith('#'):
                             color = Gdk.color_parse(value)
                             widget.set_color(color)
@@ -287,13 +292,13 @@ class TweaksWindow:
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
                     elif setting.type == 'number':
-                        value = setting.get_value()
+                        value_to_display = value
                         if 'percentage' in setting.definition and setting.definition['percentage']:
                             w_min = 0
                             w_max = 100
                             w_step = 1
                             val_range = setting.definition['max'] - setting.definition['min']
-                            value = int((value - setting.definition['min']) / val_range * 100)
+                            value_to_display = int((value - setting.definition['min']) / val_range * 100)
 
                         else:
                             w_min = setting.definition['min']
@@ -302,8 +307,8 @@ class TweaksWindow:
                         widget = Gtk.SpinButton.new_with_range(w_min, w_max, w_step)
                         setting.widget = widget
                         widget.setting = setting
-                        if value is not None:
-                            widget.set_value(float(value))
+                        if value_to_display is not None:
+                            widget.set_value(float(value_to_display))
                         widget.connect('value-changed', self.on_widget_changed)
                         setting.connect(self.on_setting_change)
                         wbox.pack_start(widget, False, False, 0)
@@ -377,9 +382,6 @@ class TweaksWindow:
         # so it's possible to go back to the same page
         if self.leaflet.get_folded():
             self.listbox.unselect_row(row)
-
-    def on_main_window_destroy(self, widget):
-        Gtk.main_quit()
 
     def on_back_clicked(self, widget, *args):
         self.leaflet.set_visible_child_name('sidebar')

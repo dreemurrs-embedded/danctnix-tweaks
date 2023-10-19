@@ -43,6 +43,14 @@
           map:
             true: 1
             false: 0
+    - name: Lockscreen
+      weight: 27
+      settings:
+        - name: Shuffle keypad
+          help: Whether to shuffle the numbers on the keypad
+          type: boolean
+          backend: gsettings
+          key: sm.puri.phosh.lockscreen.shuffle-keypad
     - name: Display notch tweaks
       weight: 30
       settings:

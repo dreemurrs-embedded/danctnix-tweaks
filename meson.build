@@ -1,9 +1,9 @@
 project('danctnix-tweaks',
-    version: '0.12.0',
+    version: '0.13.1',
     meson_version: '>= 0.50.0',
     default_options: ['warning_level=2'])
 
-dependency('libhandy-1', version: '>=1.0.0')
+dependency('libhandy-1', version: '>=1.5.0')
 
 subdir('data')
 subdir('danctnix_tweaks')

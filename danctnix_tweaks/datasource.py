@@ -25,13 +25,14 @@ class Gtk3ThemesDatasource(Datasource):
 
         result = []
         theme_dirs = glob.glob('/usr/share/themes/*') + \
-                     glob.glob(os.path.expanduser('~/.local/share/themes/*'))
+                     glob.glob(os.path.expanduser('~/.local/share/themes/*')) + \
+                     glob.glob(os.path.expanduser('~/.themes/*'))
         for dir in theme_dirs:
             if os.path.isfile(os.path.join(dir, 'gtk-3.0/gtk.css')):
                 result.append(os.path.basename(dir))
             elif os.path.isdir(os.path.join(dir, f'gtk-{gtk_ver}')):
                 result.append(os.path.basename(dir))
-        result_map = {}
+        result_map = {'Adwaita': 'Adwaita', 'High Contrast': 'HighContrast'}
         for theme in sorted(result):
             name = theme
             metafile = os.path.join('/usr/share/themes', theme, 'index.theme')
@@ -51,7 +52,8 @@ class IconthemesDatasource(Datasource):
     def get_map(self):
         result = []
         theme_dirs = glob.glob('/usr/share/icons/*') + \
-                     glob.glob(os.path.expanduser('~/.local/share/icons/*'))
+                     glob.glob(os.path.expanduser('~/.local/share/icons/*')) + \
+                     glob.glob(os.path.expanduser('~/.icons/*'))
         for dir in theme_dirs:
             if os.path.isfile(os.path.join(dir, 'index.theme')):
                 result.append(dir)

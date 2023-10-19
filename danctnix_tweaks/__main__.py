@@ -11,19 +11,29 @@ gi.require_version('Handy', '1')
 from gi.repository import Handy
 
 
+Handy.init()
+
+
 class TweaksApplication(Gtk.Application):
     def __init__(self, application_id, flags, datadir):
         self.datadir = datadir
+        self.window = None
         Gtk.Application.__init__(self, application_id=application_id, flags=flags)
         GLib.set_prgname(application_id)
-        self.connect("activate", self.new_window)
 
-    def new_window(self, *args):
-        TweaksWindow(self, self.datadir)
+    def do_activate(self, *args):
+        if not self.window:
+            self.window = TweaksWindow(self, self.datadir)
+        self.window.present()
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+
+        Handy.StyleManager.get_default().set_color_scheme(
+            Handy.ColorScheme.PREFER_LIGHT)
 
 
 def main(version, datadir=None):
-    Handy.init()
     app = TweaksApplication("org.danctnix.Tweaks", Gio.ApplicationFlags.FLAGS_NONE, datadir)
     app.run()
 
