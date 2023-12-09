@@ -83,7 +83,8 @@ class Setting:
     def create_map_from_data(self):
         classname = self.data.title() + 'Datasource'
         if not hasattr(datasources, classname):
-            raise ValueError(f"Unknown data source: {self.data}, missing class danctnix_tweaks.datasource.{classname}")
+            raise ValueError(f"Unknown data source: {self.data}, missing class"
+                             f" danctnix_tweaks.datasource.{classname}")
         class_ref = getattr(datasources, classname)
 
         if self.daemon and class_ref.NOT_IN_DAEMON:
@@ -140,7 +141,8 @@ class SettingsTree:
 
                     for setting in section['settings']:
 
-                        if setting['name'] not in self.settings[page['name']]['sections'][section['name']]['settings']:
+                        if setting['name'] not in self.settings[page['name']]['sections']\
+                                [section['name']]['settings']:
                             setting_obj = Setting(setting, daemon=self.daemon)
                             if not setting_obj.valid:
                                 continue

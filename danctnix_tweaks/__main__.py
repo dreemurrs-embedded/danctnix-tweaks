@@ -1,5 +1,3 @@
-import argparse
-import os
 import gi
 
 from danctnix_tweaks.window import TweaksWindow

@@ -1,0 +1,23 @@
+---
+image: "alpine:latest"
+.only-default: &only-default
+  only:
+    - master
+    - wip
+    - merge_requests
+
+ruff:
+  <<: *only-default
+  image: "alpine:edge"
+  before_script:
+  - "echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories"
+  - "adduser -D build"
+  script:
+  - ".ci/ruff.sh"
+
+vermin:
+  <<: *only-default
+  before_script:
+  - "adduser -D build"
+  script:
+  - ".ci/vermin.sh"
